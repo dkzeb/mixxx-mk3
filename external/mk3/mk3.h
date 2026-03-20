@@ -15,6 +15,11 @@ typedef void (*mk3_stepper_callback_t)(int8_t direction, uint8_t position, void*
 mk3_t* mk3_open(void);
 void mk3_close(mk3_t* dev);
 
+// Open device for display-only access (claims interface 5 only, not interface 4).
+// Use when another process (e.g., Mixxx) holds the HID interface.
+mk3_t* mk3_open_display(void);
+void mk3_close_display(mk3_t* dev);
+
 int mk3_display_draw(mk3_t* dev, int screen_index, const uint16_t* rgb565);
 
 // Display configuration
