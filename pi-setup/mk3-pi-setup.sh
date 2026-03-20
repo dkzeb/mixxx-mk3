@@ -77,9 +77,9 @@ fi
 sudo sed -i "s|HOME=/home/pi|HOME=$PI_HOME|" /etc/systemd/system/mixxx.service
 
 sudo systemctl daemon-reload
-sudo systemctl enable mk3-screen-daemon.service
 sudo systemctl enable mixxx.service
-echo "Services enabled: mk3-screen-daemon, mixxx"
+# mk3-screen-daemon is started by udev on MK3 plug-in, no enable needed
+echo "Services installed. Screen daemon is plug-and-play via udev."
 
 # ── 6. Configure display ────────────────────────────────────────────
 echo "--- [6/7] Configuring display ---"
@@ -123,11 +123,12 @@ echo "=============================="
 echo "  Setup complete!"
 echo "=============================="
 echo ""
-echo "What happens on reboot:"
-echo "  1. Pi boots → boot messages appear on MK3 screens"
-echo "  2. mk3-screen-daemon starts (mirrors /dev/fb0 to MK3)"
+echo "What happens:"
+echo "  1. MK3 plugged in → udev starts screen daemon automatically"
+echo "  2. Screen daemon mirrors /dev/fb0 to MK3 screens"
 echo "  3. Mixxx starts fullscreen → MK3 screens show Mixxx UI"
 echo "  4. MK3 HID mapping auto-loads → controls are live"
+echo "  5. MK3 unplugged → screen daemon stops automatically"
 echo ""
 echo "Connect the MK3 via USB, then reboot:"
 echo "  sudo reboot"

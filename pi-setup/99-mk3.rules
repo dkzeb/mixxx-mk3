@@ -1,2 +1,3 @@
 # Native Instruments Maschine MK3
-SUBSYSTEM=="usb", ATTR{idVendor}=="17cc", ATTR{idProduct}=="1600", MODE="0660", GROUP="audio"
+# Set permissions and start/stop screen daemon on plug/unplug
+SUBSYSTEM=="usb", ATTR{idVendor}=="17cc", ATTR{idProduct}=="1600", MODE="0660", GROUP="audio", TAG+="systemd", ENV{SYSTEMD_WANTS}="mk3-screen-daemon.service"
