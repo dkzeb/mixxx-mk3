@@ -262,6 +262,7 @@ MaschineMK3.libraryVisible = false;    // whether the library panel is shown
 MaschineMK3.padMode       = "hotcues"; // "hotcues" | "loops" | "sampler" | "effects"
 MaschineMK3.lastButtonState = {};      // name -> pressed bool, for edge detection
 MaschineMK3.lastStepperPos  = -1;
+MaschineMK3.lastKnobValue  = {};      // name -> last raw value, for delta tracking
 
 // Loop sizes indexed by physical pad number within a deck (1-8)
 MaschineMK3.loopSizes = [0.125, 0.25, 0.5, 1, 2, 4, 8, 16];
@@ -477,6 +478,38 @@ MaschineMK3.onButtonPress = function(name) {
         MaschineMK3.setMode("effects");
         break;
 
+    // --- D buttons: per-deck controls (D1-D4 = Deck A, D5-D8 = Deck B) ---
+    // D1/D5: Sync
+    case "d1":
+        engine.setValue("[Channel1]", "sync_enabled",
+            engine.getValue("[Channel1]", "sync_enabled") ? 0 : 1);
+        break;
+    case "d5":
+        engine.setValue("[Channel2]", "sync_enabled",
+            engine.getValue("[Channel2]", "sync_enabled") ? 0 : 1);
+        break;
+    // D2/D6: Tempo nudge down (momentary)
+    case "d2":
+        engine.setValue("[Channel1]", "rate_temp_down", 1);
+        break;
+    case "d6":
+        engine.setValue("[Channel2]", "rate_temp_down", 1);
+        break;
+    // D3/D7: Tempo nudge up (momentary)
+    case "d3":
+        engine.setValue("[Channel1]", "rate_temp_up", 1);
+        break;
+    case "d7":
+        engine.setValue("[Channel2]", "rate_temp_up", 1);
+        break;
+    // D4/D8: Play/Pause (per-deck, independent of active deck)
+    case "d4":
+        engine.setValue("[Channel1]", "play", !engine.getValue("[Channel1]", "play"));
+        break;
+    case "d8":
+        engine.setValue("[Channel2]", "play", !engine.getValue("[Channel2]", "play"));
+        break;
+
     // --- Deck select: select + arrow left/right ---
     case "select":
         MaschineMK3.selectPressed = true;
@@ -543,6 +576,19 @@ MaschineMK3.onButtonRelease = function(name) {
     case "recCountIn":
         engine.setValue("[Channel" + MaschineMK3.activeDeck + "]", "cue_default", 0);
         break;
+    // D button releases — tempo nudge (momentary)
+    case "d2":
+        engine.setValue("[Channel1]", "rate_temp_down", 0);
+        break;
+    case "d3":
+        engine.setValue("[Channel1]", "rate_temp_up", 0);
+        break;
+    case "d6":
+        engine.setValue("[Channel2]", "rate_temp_down", 0);
+        break;
+    case "d7":
+        engine.setValue("[Channel2]", "rate_temp_up", 0);
+        break;
     // Library nav pulses
     case "navUp":
         engine.setValue("[Library]", "MoveUp", 0);
@@ -569,8 +615,61 @@ MaschineMK3.onButtonRelease = function(name) {
 MaschineMK3.onKnobChange = function(name, value) {
     var norm = value / 4095.0;
 
+    // Delta tracking for relative controls
+    var delta = 0;
+    if (MaschineMK3.lastKnobValue[name] !== undefined) {
+        delta = value - MaschineMK3.lastKnobValue[name];
+        // Handle wraparound (shouldn't happen with pots, but be safe)
+        if (delta > 2048) { delta -= 4096; }
+        if (delta < -2048) { delta += 4096; }
+    }
+    MaschineMK3.lastKnobValue[name] = value;
+
     switch (name) {
-    // k1-k8: unmapped for now
+    // --- K1-K4: Deck A controls ---
+    // K1: Tempo rate (delta-based, ~0.05% per tick)
+    case "k1":
+        if (delta !== 0) {
+            var rateA = engine.getValue("[Channel1]", "rate");
+            engine.setValue("[Channel1]", "rate", rateA + (delta * 0.0002));
+        }
+        break;
+    // K2: Scrub/jog (delta-based)
+    case "k2":
+        if (delta !== 0) {
+            engine.setValue("[Channel1]", "jog", delta * 0.1);
+        }
+        break;
+    // K3: Channel volume (absolute)
+    case "k3":
+        engine.setValue("[Channel1]", "volume", norm);
+        break;
+
+    // --- K5-K8: Deck B controls ---
+    // K5: Tempo rate
+    case "k5":
+        if (delta !== 0) {
+            var rateB = engine.getValue("[Channel2]", "rate");
+            engine.setValue("[Channel2]", "rate", rateB + (delta * 0.0002));
+        }
+        break;
+    // K6: Scrub/jog
+    case "k6":
+        if (delta !== 0) {
+            engine.setValue("[Channel2]", "jog", delta * 0.1);
+        }
+        break;
+    // K7: Channel volume (absolute)
+    case "k7":
+        engine.setValue("[Channel2]", "volume", norm);
+        break;
+
+    // K4/K8: Crossfader (both map to same control)
+    case "k4":
+    case "k8":
+        engine.setValue("[Master]", "crossfader", (norm * 2.0) - 1.0);
+        break;
+
     // Master / headphone
     case "masterVolume":
         engine.setValue("[Master]", "gain", norm);
@@ -790,6 +889,29 @@ MaschineMK3.init = function(/* id, debugging */) {
                 function() { MaschineMK3.updatePadLEDs(); });
         })(i);
     }
+
+    // --- D button LED feedback (per-deck sync + play indicators) ---
+    engine.makeConnection("[Channel1]", "sync_enabled", function(value) {
+        MaschineMK3.setLed("d1", value ? 63 : 16);
+    });
+    engine.makeConnection("[Channel2]", "sync_enabled", function(value) {
+        MaschineMK3.setLed("d5", value ? 63 : 16);
+    });
+    engine.makeConnection("[Channel1]", "play_indicator", function(value) {
+        MaschineMK3.setLed("d4", value ? 63 : 16);
+    });
+    engine.makeConnection("[Channel2]", "play_indicator", function(value) {
+        MaschineMK3.setLed("d8", value ? 63 : 16);
+    });
+    // Dim the nudge buttons (always available)
+    MaschineMK3.setLed("d1", 16);
+    MaschineMK3.setLed("d2", 16);
+    MaschineMK3.setLed("d3", 16);
+    MaschineMK3.setLed("d4", 16);
+    MaschineMK3.setLed("d5", 16);
+    MaschineMK3.setLed("d6", 16);
+    MaschineMK3.setLed("d7", 16);
+    MaschineMK3.setLed("d8", 16);
 
     // --- Browser LED (dim = available, bright = library open) ---
     MaschineMK3.setLed("browserPlugin", 16);
