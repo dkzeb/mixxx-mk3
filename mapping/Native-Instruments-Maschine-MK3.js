@@ -302,7 +302,7 @@ MaschineMK3.selectPressed = false;     // "select" button held = modifier for de
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
 MaschineMK3.libraryVisible = false;    // whether the library panel is shown
 MaschineMK3.mixerVisible   = false;    // whether the mixer panel is shown
-MaschineMK3.padMode       = "loops";   // "loops" | "effects" — toggled by performFxSelect
+MaschineMK3.padMode       = null;      // null | "loops" | "effects" — null = pads inactive
 MaschineMK3.lastButtonState = {};      // name -> pressed bool, for edge detection
 MaschineMK3.lastStepperPos  = -1;
 MaschineMK3.lastKnobValue  = {};      // name -> last raw value, for delta tracking
@@ -390,11 +390,10 @@ MaschineMK3.updateLibrary = function() {
 MaschineMK3.updatePanels = function() {
     var showLib = MaschineMK3.libraryVisible;
     var showMix = MaschineMK3.mixerVisible;
-    // Show pad panel when no other panel is open
-    var showPads = !showLib && !showMix;
-    var showPadsLoops = showPads && MaschineMK3.padMode === "loops";
-    var showPadsFx = showPads && MaschineMK3.padMode === "effects";
-    var anyPanel = showLib || showMix || showPads;
+    // Show pad panel only when pad mode is active and no other panel is open
+    var showPadsLoops = !showLib && !showMix && MaschineMK3.padMode === "loops";
+    var showPadsFx = !showLib && !showMix && MaschineMK3.padMode === "effects";
+    var anyPanel = showLib || showMix || showPadsLoops || showPadsFx;
 
     engine.setValue("[Skin]", "show_library", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_mixer", showMix ? 1 : 0);
@@ -525,9 +524,13 @@ MaschineMK3.processTouchstrip = function(data) {
 // updatePadModeLED — show current pad mode on the performFxSelect LED.
 // ---------------------------------------------------------------------------
 MaschineMK3.updatePadModeLED = function() {
-    // Bright when in loops mode, dim when in effects mode
-    MaschineMK3.setLed("performFxSelect",
-        MaschineMK3.padMode === "loops" ? 63 : 16);
+    if (MaschineMK3.padMode === "loops") {
+        MaschineMK3.setLed("performFxSelect", 63);
+    } else if (MaschineMK3.padMode === "effects") {
+        MaschineMK3.setLed("performFxSelect", 32);
+    } else {
+        MaschineMK3.setLed("performFxSelect", 8);  // dim = inactive
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -537,6 +540,14 @@ MaschineMK3.updatePadModeLED = function() {
 MaschineMK3.updatePadLEDs = function() {
     var C = MaschineMK3.Color;
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
+
+    if (MaschineMK3.padMode === null) {
+        // Pads off
+        for (var pad = 1; pad <= 16; pad++) {
+            MaschineMK3.setLed(MaschineMK3.padPhysicalToLed[pad], C.OFF);
+        }
+        return;
+    }
 
     if (MaschineMK3.padMode === "loops") {
         var loopEnabled = engine.getValue(ch, "loop_enabled");
@@ -621,15 +632,17 @@ MaschineMK3.onButtonPress = function(name) {
     // --- Pad mode: performFxSelect toggles loops, shift+performFxSelect toggles effects ---
     case "performFxSelect":
         if (MaschineMK3.shiftPressed) {
-            // Shift + press: switch to effects mode
-            MaschineMK3.padMode = (MaschineMK3.padMode === "effects") ? "loops" : "effects";
+            // Shift + press: toggle effects mode on/off
+            MaschineMK3.padMode = (MaschineMK3.padMode === "effects") ? null : "effects";
         } else {
-            // Normal press: switch to loops mode
-            MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? "effects" : "loops";
+            // Normal press: toggle loops mode on/off
+            MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? null : "loops";
         }
-        // Close library/mixer if open, show pad panel
-        MaschineMK3.libraryVisible = false;
-        MaschineMK3.mixerVisible = false;
+        // Close library/mixer if opening a pad mode
+        if (MaschineMK3.padMode !== null) {
+            MaschineMK3.libraryVisible = false;
+            MaschineMK3.mixerVisible = false;
+        }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
@@ -841,6 +854,7 @@ MaschineMK3.onStepperChange = function(direction) {
 // padNumber: physical pad number (1-16).
 // ---------------------------------------------------------------------------
 MaschineMK3.onPadPress = function(padNumber) {
+    if (MaschineMK3.padMode === null) { return; }
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
 
     if (MaschineMK3.padMode === "loops") {
