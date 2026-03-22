@@ -708,7 +708,7 @@ MaschineMK3.onKnobChange = function(name, value) {
     switch (name) {
     // --- K1-K4: Deck A ---
     case "k1": // Tempo rate (-1 to 1, 0 = normal)
-        MaschineMK3.adjustValue("[Channel1]", "rate", delta, 0.0005, -1, 1);
+        MaschineMK3.adjustValue("[Channel1]", "rate", delta, 0.002, -1, 1);
         break;
     case "k2": // Scrub/jog
         engine.setValue("[Channel1]", "jog", delta * 0.1);
@@ -722,7 +722,7 @@ MaschineMK3.onKnobChange = function(name, value) {
 
     // --- K5-K8: Deck B ---
     case "k5": // Tempo rate
-        MaschineMK3.adjustValue("[Channel2]", "rate", delta, 0.0005, -1, 1);
+        MaschineMK3.adjustValue("[Channel2]", "rate", delta, 0.002, -1, 1);
         break;
     case "k6": // Scrub/jog
         engine.setValue("[Channel2]", "jog", delta * 0.1);
