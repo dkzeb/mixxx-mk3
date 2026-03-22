@@ -302,7 +302,7 @@ MaschineMK3.selectPressed = false;     // "select" button held = modifier for de
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
 MaschineMK3.libraryVisible = false;    // whether the library panel is shown
 MaschineMK3.mixerVisible   = false;    // whether the mixer panel is shown
-// Pads are always loop controls for the active deck
+MaschineMK3.padMode       = "loops";   // "loops" | "effects" — toggled by performFxSelect
 MaschineMK3.lastButtonState = {};      // name -> pressed bool, for edge detection
 MaschineMK3.lastStepperPos  = -1;
 MaschineMK3.lastKnobValue  = {};      // name -> last raw value, for delta tracking
@@ -369,6 +369,9 @@ MaschineMK3.updateDeckLEDs = function() {
 
     // Reconnect transport LEDs to follow new active deck
     MaschineMK3.connectTransportLEDs();
+
+    // Update pad LEDs to reflect the new deck's state
+    MaschineMK3.updatePadLEDs();
 };
 
 // ---------------------------------------------------------------------------
@@ -512,8 +515,13 @@ MaschineMK3.processTouchstrip = function(data) {
     MaschineMK3.touchstripLastValue = raw;
 };
 
-MaschineMK3.setMode = function() {
-    MaschineMK3.updatePadLEDs();
+// ---------------------------------------------------------------------------
+// updatePadModeLED — show current pad mode on the performFxSelect LED.
+// ---------------------------------------------------------------------------
+MaschineMK3.updatePadModeLED = function() {
+    // Bright when in loops mode, dim when in effects mode
+    MaschineMK3.setLed("performFxSelect",
+        MaschineMK3.padMode === "loops" ? 63 : 16);
 };
 
 // ---------------------------------------------------------------------------
@@ -523,32 +531,55 @@ MaschineMK3.setMode = function() {
 MaschineMK3.updatePadLEDs = function() {
     var C = MaschineMK3.Color;
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
-    var loopEnabled = engine.getValue(ch, "loop_enabled");
-    var currentLoopSize = engine.getValue(ch, "beatloop_size");
 
-    for (var pad = 1; pad <= 16; pad++) {
-        var ledName = MaschineMK3.padPhysicalToLed[pad];
-        var size = MaschineMK3.loopSizes[pad];
-        var color = C.OFF;
+    if (MaschineMK3.padMode === "loops") {
+        var loopEnabled = engine.getValue(ch, "loop_enabled");
+        var currentLoopSize = engine.getValue(ch, "beatloop_size");
 
-        if (size > 0) {
-            // Beat loop pad — green if this is the active loop size, cyan otherwise
-            if (loopEnabled && currentLoopSize === size) {
-                color = C.GREEN;   // active loop
+        for (var pad = 1; pad <= 16; pad++) {
+            var ledName = MaschineMK3.padPhysicalToLed[pad];
+            var size = MaschineMK3.loopSizes[pad];
+            var color = C.OFF;
+
+            if (size > 0) {
+                if (loopEnabled && currentLoopSize === size) {
+                    color = C.GREEN;   // active loop
+                } else {
+                    color = C.CYAN;    // available
+                }
             } else {
-                color = C.CYAN;    // available
+                switch (pad) {
+                case 1: color = loopEnabled ? C.YELLOW : C.OFF; break;  // halve
+                case 2: color = loopEnabled ? C.YELLOW : C.OFF; break;  // double
+                case 3: color = loopEnabled ? C.GREEN : C.ORANGE; break; // reloop
+                case 4: color = loopEnabled ? C.RED : C.OFF; break;     // exit
+                }
             }
-        } else {
-            // Special action pads (bottom row, closest to you)
-            switch (pad) {
-            case 1: color = loopEnabled ? C.YELLOW : C.OFF; break;  // halve
-            case 2: color = loopEnabled ? C.YELLOW : C.OFF; break;  // double
-            case 3: color = loopEnabled ? C.GREEN : C.ORANGE; break; // reloop
-            case 4: color = loopEnabled ? C.RED : C.OFF; break;     // exit
-            }
+            MaschineMK3.setLed(ledName, color);
         }
 
-        MaschineMK3.setLed(ledName, color);
+    } else if (MaschineMK3.padMode === "effects") {
+        var fxUnit = MaschineMK3.activeDeck === 1
+            ? "[EffectRack1_EffectUnit1]"
+            : "[EffectRack1_EffectUnit2]";
+
+        for (var pad = 1; pad <= 16; pad++) {
+            var ledName = MaschineMK3.padPhysicalToLed[pad];
+            var color = C.OFF;
+
+            if (pad >= 1 && pad <= 3) {
+                // FX parameter toggles (pads 1-3)
+                var fxOn = engine.getValue(fxUnit, "parameter" + pad);
+                color = fxOn ? C.PURPLE : C.BLUE;
+            } else if (pad === 4) {
+                // FX unit enable
+                var enabled = engine.getValue(fxUnit, "enabled");
+                color = enabled ? C.RED : C.PINK;
+            }
+            // Pads 5-16: off in effects mode (available for future FX)
+
+            MaschineMK3.setLed(ledName, color);
+        }
     }
 };
 
@@ -580,6 +611,19 @@ MaschineMK3.onButtonPress = function(name) {
         break;
 
     // g1-g4: available for future use
+
+    // --- Pad mode: performFxSelect toggles loops, shift+performFxSelect toggles effects ---
+    case "performFxSelect":
+        if (MaschineMK3.shiftPressed) {
+            // Shift + press: toggle effects mode
+            MaschineMK3.padMode = (MaschineMK3.padMode === "effects") ? "loops" : "effects";
+        } else {
+            // Normal press: toggle loops mode
+            MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? "effects" : "loops";
+        }
+        MaschineMK3.updatePadModeLED();
+        MaschineMK3.updatePadLEDs();
+        break;
 
     // --- D buttons: per-deck controls (D1-D4 = Deck A, D5-D8 = Deck B) ---
     // D1/D5: Sync
@@ -784,31 +828,38 @@ MaschineMK3.onStepperChange = function(direction) {
 // ---------------------------------------------------------------------------
 MaschineMK3.onPadPress = function(padNumber) {
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
-    var size = MaschineMK3.loopSizes[padNumber];
 
-    // Quantize to beat unless shift is held
-    engine.setValue(ch, "quantize", MaschineMK3.shiftPressed ? 0 : 1);
+    if (MaschineMK3.padMode === "loops") {
+        var size = MaschineMK3.loopSizes[padNumber];
 
-    if (size > 0) {
-        // Beat loop — toggle loop at this size
-        engine.setValue(ch, "beatloop_" + size + "_toggle", 1);
-    } else {
-        // Special actions (bottom row)
-        switch (padNumber) {
-        case 1: // Loop halve
-            engine.setValue(ch, "loop_halve", 1);
-            break;
-        case 2: // Loop double
-            engine.setValue(ch, "loop_double", 1);
-            break;
-        case 3: // Reloop/toggle
-            engine.setValue(ch, "reloop_toggle", 1);
-            break;
-        case 4: // Loop exit
-            engine.setValue(ch, "reloop_toggle", 1);
-            break;
+        // Quantize to beat unless shift is held
+        engine.setValue(ch, "quantize", MaschineMK3.shiftPressed ? 0 : 1);
+
+        if (size > 0) {
+            engine.setValue(ch, "beatloop_" + size + "_toggle", 1);
+        } else {
+            switch (padNumber) {
+            case 1: engine.setValue(ch, "loop_halve", 1); break;
+            case 2: engine.setValue(ch, "loop_double", 1); break;
+            case 3: engine.setValue(ch, "reloop_toggle", 1); break;
+            case 4: engine.setValue(ch, "reloop_toggle", 1); break;
+            }
+        }
+
+    } else if (MaschineMK3.padMode === "effects") {
+        var fxUnit = MaschineMK3.activeDeck === 1
+            ? "[EffectRack1_EffectUnit1]"
+            : "[EffectRack1_EffectUnit2]";
+
+        if (padNumber >= 1 && padNumber <= 3) {
+            var current = engine.getValue(fxUnit, "parameter" + padNumber);
+            engine.setValue(fxUnit, "parameter" + padNumber, current ? 0 : 1);
+        } else if (padNumber === 4) {
+            var enabled = engine.getValue(fxUnit, "enabled");
+            engine.setValue(fxUnit, "enabled", enabled ? 0 : 1);
         }
     }
+
     MaschineMK3.updatePadLEDs();
 };
 
@@ -986,6 +1037,9 @@ MaschineMK3.init = function(/* id, debugging */) {
         MaschineMK3.updateTouchstripLEDs();
     });
     MaschineMK3.updateTouchstripLEDs();
+
+    // --- Pad mode LED ---
+    MaschineMK3.updatePadModeLED();
 
     // --- Browser + Mixer + Settings LEDs (dim = available) ---
     MaschineMK3.setLed("browserPlugin", 16);
