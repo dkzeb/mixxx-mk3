@@ -168,6 +168,13 @@
     qproperty-alignment: AlignCenter;
 }
 
+#DLabelActive {
+    font-size: 9px;
+    font-weight: bold;
+    color: #e67e22;
+    qproperty-alignment: AlignCenter;
+}
+
 #KnobLabels {
     background-color: #0d0d1a;
 }

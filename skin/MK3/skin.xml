@@ -65,7 +65,17 @@
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>SYNC</Text></Label>
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>TEMPO-</Text></Label>
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>TEMPO+</Text></Label>
-            <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>CUE</Text></Label>
+            <WidgetGroup>
+              <Size>120,12</Size><SizePolicy>f,f</SizePolicy>
+              <Children>
+                <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>CUE</Text>
+                  <Connection><ConfigKey>[Channel1],pfl</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
+                </Label>
+                <Label><ObjectName>DLabelActive</ObjectName><Size>120,12</Size><Text>CUE</Text>
+                  <Connection><ConfigKey>[Channel1],pfl</ConfigKey><BindProperty>visible</BindProperty></Connection>
+                </Label>
+              </Children>
+            </WidgetGroup>
           </Children>
         </WidgetGroup>
 
@@ -635,7 +645,17 @@
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>SYNC</Text></Label>
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>TEMPO-</Text></Label>
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>TEMPO+</Text></Label>
-            <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>CUE</Text></Label>
+            <WidgetGroup>
+              <Size>120,12</Size><SizePolicy>f,f</SizePolicy>
+              <Children>
+                <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>CUE</Text>
+                  <Connection><ConfigKey>[Channel2],pfl</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
+                </Label>
+                <Label><ObjectName>DLabelActive</ObjectName><Size>120,12</Size><Text>CUE</Text>
+                  <Connection><ConfigKey>[Channel2],pfl</ConfigKey><BindProperty>visible</BindProperty></Connection>
+                </Label>
+              </Children>
+            </WidgetGroup>
           </Children>
         </WidgetGroup>
 
