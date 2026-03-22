@@ -257,7 +257,7 @@ MaschineMK3.report81 = new Array(43).fill(0);   // [0]=0x81, [1..42]=data
 // ---------------------------------------------------------------------------
 // Touchstrip constants
 MaschineMK3.TOUCHSTRIP_LEDS = 25;          // ts1-ts25
-MaschineMK3.TOUCHSTRIP_ADDR = 28;          // suspected byte address in report 0x01
+MaschineMK3.TOUCHSTRIP_ADDR = 30;          // byte offset in report 0x01 (16-bit LE, 0-1024)
 MaschineMK3.touchstripTapTimes = [];        // timestamps for triple-tap detection
 MaschineMK3.touchstripLastValue = -1;       // last raw touchstrip value
 MaschineMK3.touchstripTouched = false;      // whether strip is being touched
@@ -439,25 +439,13 @@ MaschineMK3.updateTouchstripLEDs = function() {
 // Called from parseReport01. Bytes 28-29 are suspected position (16-bit LE).
 // ---------------------------------------------------------------------------
 MaschineMK3.processTouchstrip = function(data) {
-    // Debug: scan bytes 28-35 for any changes (touchstrip data location unknown)
-    if (!MaschineMK3.lastTsDebug) { MaschineMK3.lastTsDebug = [0,0,0,0,0,0,0,0]; }
-    var changed = false;
-    var dbg = "";
-    for (var b = 28; b <= 35; b++) {
-        var val = data[b] || 0;
-        if (val !== MaschineMK3.lastTsDebug[b - 28]) { changed = true; }
-        MaschineMK3.lastTsDebug[b - 28] = val;
-        dbg += " b" + b + "=" + val;
-    }
-    if (changed) {
-        print("MK3 ts-scan:" + dbg);
-    }
-
-    // Try bytes 28-29 as 16-bit LE position
-    var raw = (data[29] << 8) | data[28];
+    // Touchstrip position: 16-bit LE at byte offset 30-31, range 0-1024, 0 = released
+    if (data.length < 32) { return; }
+    var raw = (data[31] << 8) | data[30];
     var touching = raw > 0;
     var wasTouching = MaschineMK3.touchstripTouched;
 
+    // Triple-tap detection (3 touches within 800ms → reset crossfader)
     if (touching && !wasTouching) {
         var now = Date.now();
         MaschineMK3.touchstripTapTimes.push(now);
@@ -467,13 +455,14 @@ MaschineMK3.processTouchstrip = function(data) {
         }
         if (MaschineMK3.touchstripTapTimes.length >= 3) {
             engine.setValue("[Master]", "crossfader", 0);
+            MaschineMK3.updateTouchstripLEDs();
             MaschineMK3.touchstripTapTimes = [];
-            print("MK3: Crossfader reset to center (triple-tap)");
         }
     }
 
+    // Map position to crossfader (-1 to +1)
     if (touching && raw !== MaschineMK3.touchstripLastValue) {
-        var norm = Math.max(0, Math.min(1, raw / 1023.0));
+        var norm = Math.max(0, Math.min(1, raw / 1024.0));
         var xfader = (norm * 2.0) - 1.0;
         engine.setValue("[Master]", "crossfader", xfader);
     }
