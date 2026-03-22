@@ -54,6 +54,43 @@
           </Connection>
         </WidgetGroup>
 
+        <!-- Knob labels: normal mode (shown when mixer closed) -->
+        <WidgetGroup>
+          <ObjectName>KnobLabels</ObjectName>
+          <Size>480,12</Size>
+          <SizePolicy>me,f</SizePolicy>
+          <Layout>horizontal</Layout>
+          <Connection>
+            <ConfigKey>[Skin],show_mixer</ConfigKey>
+            <BindProperty>visible</BindProperty>
+            <Transform><Not/></Transform>
+          </Connection>
+          <Children>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>TEMPO</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>JOG</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>FILTER</Text></Label>
+          </Children>
+        </WidgetGroup>
+
+        <!-- Knob labels: mixer mode (shown when mixer open) -->
+        <WidgetGroup>
+          <ObjectName>KnobLabels</ObjectName>
+          <Size>480,12</Size>
+          <SizePolicy>me,f</SizePolicy>
+          <Layout>horizontal</Layout>
+          <Connection>
+            <ConfigKey>[Skin],show_mixer</ConfigKey>
+            <BindProperty>visible</BindProperty>
+          </Connection>
+          <Children>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>HI</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>MID</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>LO</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
+          </Children>
+        </WidgetGroup>
+
         <!-- Track info (single row: title — artist) -->
         <WidgetGroup>
           <ObjectName>TrackInfoA</ObjectName>
@@ -140,6 +177,14 @@
             <Color>#FF001C</Color>
             <TextColor>#FFFFFF</TextColor>
           </Mark>
+          <Mark><Control>hotcue_1_position</Control><Text>1</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_2_position</Control><Text>2</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_3_position</Control><Text>3</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_4_position</Control><Text>4</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_5_position</Control><Text>5</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
+          <Mark><Control>hotcue_6_position</Control><Text>6</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
+          <Mark><Control>hotcue_7_position</Control><Text>7</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
+          <Mark><Control>hotcue_8_position</Control><Text>8</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
         </Visual>
 
         <!-- BPM and position -->
@@ -564,6 +609,43 @@
           </Connection>
         </WidgetGroup>
 
+        <!-- Knob labels: normal mode -->
+        <WidgetGroup>
+          <ObjectName>KnobLabels</ObjectName>
+          <Size>480,12</Size>
+          <SizePolicy>me,f</SizePolicy>
+          <Layout>horizontal</Layout>
+          <Connection>
+            <ConfigKey>[Skin],show_mixer</ConfigKey>
+            <BindProperty>visible</BindProperty>
+            <Transform><Not/></Transform>
+          </Connection>
+          <Children>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>TEMPO</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>JOG</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>FILTER</Text></Label>
+          </Children>
+        </WidgetGroup>
+
+        <!-- Knob labels: mixer mode -->
+        <WidgetGroup>
+          <ObjectName>KnobLabels</ObjectName>
+          <Size>480,12</Size>
+          <SizePolicy>me,f</SizePolicy>
+          <Layout>horizontal</Layout>
+          <Connection>
+            <ConfigKey>[Skin],show_mixer</ConfigKey>
+            <BindProperty>visible</BindProperty>
+          </Connection>
+          <Children>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>HI</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>MID</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>LO</Text></Label>
+            <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
+          </Children>
+        </WidgetGroup>
+
         <!-- Track info (single row) -->
         <WidgetGroup>
           <ObjectName>TrackInfoB</ObjectName>
@@ -650,6 +732,14 @@
             <Color>#FF001C</Color>
             <TextColor>#FFFFFF</TextColor>
           </Mark>
+          <Mark><Control>hotcue_1_position</Control><Text>1</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_2_position</Control><Text>2</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_3_position</Control><Text>3</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_4_position</Control><Text>4</Text><Align>bottom</Align><Color>#F39C12</Color><TextColor>#000000</TextColor></Mark>
+          <Mark><Control>hotcue_5_position</Control><Text>5</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
+          <Mark><Control>hotcue_6_position</Control><Text>6</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
+          <Mark><Control>hotcue_7_position</Control><Text>7</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
+          <Mark><Control>hotcue_8_position</Control><Text>8</Text><Align>bottom</Align><Color>#3498DB</Color><TextColor>#FFFFFF</TextColor></Mark>
         </Visual>
 
         <!-- BPM and position -->
