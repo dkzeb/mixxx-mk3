@@ -628,10 +628,21 @@ MaschineMK3.onButtonPress = function(name) {
     switch (name) {
     // --- Transport: follows active deck ---
     case "play":
-        engine.setValue(ch, "play", !engine.getValue(ch, "play"));
+        if (MaschineMK3.shiftPressed) {
+            // Shift+play: start both decks from their cue points
+            engine.setValue("[Channel1]", "cue_gotoandplay", 1);
+            engine.setValue("[Channel2]", "cue_gotoandplay", 1);
+        } else {
+            engine.setValue(ch, "play", !engine.getValue(ch, "play"));
+        }
         break;
     case "stop":
-        engine.setValue(ch, "stop", 1);
+        if (MaschineMK3.shiftPressed) {
+            engine.setValue("[Channel1]", "stop", 1);
+            engine.setValue("[Channel2]", "stop", 1);
+        } else {
+            engine.setValue(ch, "stop", 1);
+        }
         break;
     case "recCountIn":
         engine.setValue(ch, "cue_default", 1);
