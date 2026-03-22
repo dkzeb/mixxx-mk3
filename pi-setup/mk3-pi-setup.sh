@@ -33,6 +33,7 @@ sudo apt-get install -y \
     pipewire \
     pipewire-alsa \
     pipewire-jack \
+    zenity \
     wireplumber
 
 # ── 2. Build screen daemon ──────────────────────────────────────────
@@ -181,6 +182,7 @@ sudo rm -f /etc/systemd/system/pipewire.service /etc/systemd/system/wireplumber.
 # Mixxx — patched for this user (uses pw-jack for PipeWire audio)
 sed -e "s/User=pi/User=$PI_USER/" \
     -e "s|HOME=/home/pi|HOME=$PI_HOME|" \
+    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
     -e "s|/run/user/1000|/run/user/$UID_NUM|" \
     "$SCRIPT_DIR/mixxx.service" | sudo tee /etc/systemd/system/mixxx.service > /dev/null
 

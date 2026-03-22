@@ -58,6 +58,7 @@ done
 if [ -f "$SCRIPT_DIR/mixxx.service" ]; then
     sed -e "s/User=pi/User=$PI_USER/" \
         -e "s|HOME=/home/pi|HOME=$PI_HOME|" \
+        -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
         -e "s|/run/user/1000|/run/user/$UID_NUM|" \
         "$SCRIPT_DIR/mixxx.service" | sudo tee /etc/systemd/system/mixxx.service > /dev/null
 fi
@@ -77,6 +78,8 @@ fi
 # ── Apply ────────────────────────────────────────────────────────────
 chown -R "$PI_USER:$PI_USER" "$PI_HOME/.mixxx"
 sudo systemctl daemon-reload
-sudo systemctl restart mixxx
+if [ "${1:-}" != "--no-restart" ]; then
+    sudo systemctl restart mixxx
+fi
 echo ""
 echo "Update complete. Mixxx restarted."
