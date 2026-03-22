@@ -51,6 +51,20 @@
           </Connection>
         </WidgetGroup>
 
+        <!-- Control labels (aligned with D1-D4 buttons above screen) -->
+        <WidgetGroup>
+          <ObjectName>ControlLabels</ObjectName>
+          <Size>480,16</Size>
+          <SizePolicy>me,f</SizePolicy>
+          <Layout>horizontal</Layout>
+          <Children>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text>SYNC</Text></Label>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text>TEMPO-</Text></Label>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text>TEMPO+</Text></Label>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text></Text></Label>
+          </Children>
+        </WidgetGroup>
+
         <!-- Track info -->
         <WidgetGroup>
           <ObjectName>TrackInfoA</ObjectName>
@@ -183,6 +197,20 @@
             <ConfigKey>[Skin],active_deck_b</ConfigKey>
             <BindProperty>visible</BindProperty>
           </Connection>
+        </WidgetGroup>
+
+        <!-- Control labels (aligned with D5-D8 buttons above screen) -->
+        <WidgetGroup>
+          <ObjectName>ControlLabels</ObjectName>
+          <Size>480,16</Size>
+          <SizePolicy>me,f</SizePolicy>
+          <Layout>horizontal</Layout>
+          <Children>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text>SYNC</Text></Label>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text>TEMPO-</Text></Label>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text>TEMPO+</Text></Label>
+            <Label><ObjectName>CtrlLabel</ObjectName><Size>120,16</Size><Text></Text></Label>
+          </Children>
         </WidgetGroup>
 
         <!-- Track info -->

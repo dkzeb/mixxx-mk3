@@ -57,6 +57,17 @@
     background-color: #e67e22;
 }
 
+#ControlLabels {
+    background-color: #0d0d1a;
+    border-bottom: 1px solid #222222;
+}
+
+#CtrlLabel {
+    font-size: 10px;
+    color: #666666;
+    qproperty-alignment: AlignCenter;
+}
+
 #WaveformOverviewA, #WaveformOverviewB {
     border-top: 1px solid #333333;
     border-bottom: 1px solid #333333;
