@@ -302,7 +302,7 @@ MaschineMK3.selectPressed = false;     // "select" button held = modifier for de
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
 MaschineMK3.libraryVisible = false;    // whether the library panel is shown
 MaschineMK3.mixerVisible   = false;    // whether the mixer panel is shown
-MaschineMK3.padMode       = null;      // null | "loops" | "effects" — null = pads inactive
+MaschineMK3.padMode       = null;      // null | "loops" | "effects" | "cuepoints" — null = pads inactive
 MaschineMK3.lastButtonState = {};      // name -> pressed bool, for edge detection
 MaschineMK3.lastStepperPos  = -1;
 MaschineMK3.lastKnobValue  = {};      // name -> last raw value, for delta tracking
@@ -390,15 +390,17 @@ MaschineMK3.updateLibrary = function() {
 MaschineMK3.updatePanels = function() {
     var showLib = MaschineMK3.libraryVisible;
     var showMix = MaschineMK3.mixerVisible;
-    // Show pad panel only when pad mode is active and no other panel is open
-    var showPadsLoops = !showLib && !showMix && MaschineMK3.padMode === "loops";
-    var showPadsFx = !showLib && !showMix && MaschineMK3.padMode === "effects";
-    var anyPanel = showLib || showMix || showPadsLoops || showPadsFx;
+    var noPanelOpen = !showLib && !showMix;
+    var showPadsLoops = noPanelOpen && MaschineMK3.padMode === "loops";
+    var showPadsFx = noPanelOpen && MaschineMK3.padMode === "effects";
+    var showPadsCues = noPanelOpen && MaschineMK3.padMode === "cuepoints";
+    var anyPanel = showLib || showMix || showPadsLoops || showPadsFx || showPadsCues;
 
     engine.setValue("[Skin]", "show_library", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_mixer", showMix ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_loops", showPadsLoops ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_fx", showPadsFx ? 1 : 0);
+    engine.setValue("[Skin]", "show_pads_cues", showPadsCues ? 1 : 0);
 
     // Hide the non-active deck when any panel is open
     engine.setValue("[Skin]", "hide_deck_a", (anyPanel && MaschineMK3.activeDeck === 2) ? 1 : 0);
@@ -524,13 +526,16 @@ MaschineMK3.processTouchstrip = function(data) {
 // updatePadModeLED — show current pad mode on the performFxSelect LED.
 // ---------------------------------------------------------------------------
 MaschineMK3.updatePadModeLED = function() {
+    // performFxSelect LED
     if (MaschineMK3.padMode === "loops") {
         MaschineMK3.setLed("performFxSelect", 63);
     } else if (MaschineMK3.padMode === "effects") {
         MaschineMK3.setLed("performFxSelect", 32);
     } else {
-        MaschineMK3.setLed("performFxSelect", 8);  // dim = inactive
+        MaschineMK3.setLed("performFxSelect", 8);
     }
+    // padMode LED
+    MaschineMK3.setLed("padMode", MaschineMK3.padMode === "cuepoints" ? 63 : 8);
 };
 
 // ---------------------------------------------------------------------------
@@ -542,9 +547,23 @@ MaschineMK3.updatePadLEDs = function() {
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
 
     if (MaschineMK3.padMode === null) {
-        // Pads off
         for (var pad = 1; pad <= 16; pad++) {
             MaschineMK3.setLed(MaschineMK3.padPhysicalToLed[pad], C.OFF);
+        }
+        return;
+    }
+
+    if (MaschineMK3.padMode === "cuepoints") {
+        // 16 pads = hotcues 1-16 on the active deck
+        for (var pad = 1; pad <= 16; pad++) {
+            var ledName = MaschineMK3.padPhysicalToLed[pad];
+            var hcStatus = engine.getValue(ch, "hotcue_" + pad + "_status");
+            if (hcStatus) {
+                color = C.YELLOW;
+            } else {
+                color = C.OFF;
+            }
+            MaschineMK3.setLed(ledName, color);
         }
         return;
     }
@@ -627,7 +646,32 @@ MaschineMK3.onButtonPress = function(name) {
         MaschineMK3.setLed("shift", 63);
         break;
 
-    // g1-g4: available for future use
+    // --- G1-G8: Hotcues (G1-G4 = Deck A cues 1-4, G5-G8 = Deck B cues 1-4) ---
+    case "g1": case "g2": case "g3": case "g4":
+    case "g5": case "g6": case "g7": case "g8":
+        var gIdx = parseInt(name.charAt(1), 10);  // 1-8
+        var gDeck = gIdx <= 4 ? "[Channel1]" : "[Channel2]";
+        var gCue = gIdx <= 4 ? gIdx : gIdx - 4;   // cue 1-4
+        if (MaschineMK3.shiftPressed) {
+            // Shift + press: set/move cue point to current position
+            engine.setValue(gDeck, "hotcue_" + gCue + "_set", 1);
+        } else {
+            // Normal press: go to cue point (sets if not yet set)
+            engine.setValue(gDeck, "hotcue_" + gCue + "_activate", 1);
+        }
+        break;
+
+    // --- PadMode button: toggle cuepoints on pads ---
+    case "padMode":
+        MaschineMK3.padMode = (MaschineMK3.padMode === "cuepoints") ? null : "cuepoints";
+        if (MaschineMK3.padMode === "cuepoints") {
+            MaschineMK3.libraryVisible = false;
+            MaschineMK3.mixerVisible = false;
+        }
+        MaschineMK3.updatePadModeLED();
+        MaschineMK3.updatePadLEDs();
+        MaschineMK3.updatePanels();
+        break;
 
     // --- Pad mode: performFxSelect toggles loops, shift+performFxSelect toggles effects ---
     case "performFxSelect":
@@ -732,6 +776,14 @@ MaschineMK3.onButtonRelease = function(name) {
         MaschineMK3.setLed("shift", 0);
         break;
     case "browserPlugin":
+        break;
+    // G button releases — deactivate hotcue
+    case "g1": case "g2": case "g3": case "g4":
+    case "g5": case "g6": case "g7": case "g8":
+        var gIdx = parseInt(name.charAt(1), 10);
+        var gDeck = gIdx <= 4 ? "[Channel1]" : "[Channel2]";
+        var gCue = gIdx <= 4 ? gIdx : gIdx - 4;
+        engine.setValue(gDeck, "hotcue_" + gCue + "_activate", 0);
         break;
     // Cue is momentary — release resets the control
     case "recCountIn":
@@ -857,6 +909,18 @@ MaschineMK3.onPadPress = function(padNumber) {
     if (MaschineMK3.padMode === null) { return; }
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
 
+    if (MaschineMK3.padMode === "cuepoints") {
+        if (MaschineMK3.shiftPressed) {
+            // Shift + pad: set/move cue point
+            engine.setValue(ch, "hotcue_" + padNumber + "_set", 1);
+        } else {
+            // Normal pad: activate cue point (sets if not yet set)
+            engine.setValue(ch, "hotcue_" + padNumber + "_activate", 1);
+        }
+        MaschineMK3.updatePadLEDs();
+        return;
+    }
+
     if (MaschineMK3.padMode === "loops") {
         var size = MaschineMK3.loopSizes[padNumber];
 
@@ -896,7 +960,10 @@ MaschineMK3.onPadPress = function(padNumber) {
 // padNumber: physical pad number (1-16).
 // ---------------------------------------------------------------------------
 MaschineMK3.onPadRelease = function(padNumber) {
-    // No release action needed for loop toggles
+    if (MaschineMK3.padMode === "cuepoints") {
+        var ch = "[Channel" + MaschineMK3.activeDeck + "]";
+        engine.setValue(ch, "hotcue_" + padNumber + "_activate", 0);
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -1042,6 +1109,36 @@ MaschineMK3.init = function(/* id, debugging */) {
         function() { MaschineMK3.updatePadLEDs(); });
     engine.makeConnection("[Channel2]", "beatloop_size",
         function() { MaschineMK3.updatePadLEDs(); });
+
+    // --- G button LED feedback (hotcue status for cues 1-4 per deck) ---
+    MaschineMK3.updateGButtonLEDs = function() {
+        var C = MaschineMK3.Color;
+        for (var i = 1; i <= 4; i++) {
+            var hc1 = engine.getValue("[Channel1]", "hotcue_" + i + "_status");
+            MaschineMK3.setLed("g" + i, hc1 ? C.YELLOW : C.OFF);
+            var hc2 = engine.getValue("[Channel2]", "hotcue_" + i + "_status");
+            MaschineMK3.setLed("g" + (i + 4), hc2 ? C.ORANGE : C.OFF);
+        }
+    };
+    for (var hc = 1; hc <= 4; hc++) {
+        (function(idx) {
+            engine.makeConnection("[Channel1]", "hotcue_" + idx + "_status",
+                function() { MaschineMK3.updateGButtonLEDs(); });
+            engine.makeConnection("[Channel2]", "hotcue_" + idx + "_status",
+                function() { MaschineMK3.updateGButtonLEDs(); });
+        })(hc);
+    }
+    MaschineMK3.updateGButtonLEDs();
+
+    // --- Hotcue pad LED feedback ---
+    for (var hcPad = 1; hcPad <= 16; hcPad++) {
+        (function(idx) {
+            engine.makeConnection("[Channel1]", "hotcue_" + idx + "_status",
+                function() { MaschineMK3.updatePadLEDs(); });
+            engine.makeConnection("[Channel2]", "hotcue_" + idx + "_status",
+                function() { MaschineMK3.updatePadLEDs(); });
+        })(hcPad);
+    }
 
     // --- D button LED feedback (per-deck sync + play indicators) ---
     engine.makeConnection("[Channel1]", "sync_enabled", function(value) {

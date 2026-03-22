@@ -144,6 +144,16 @@
     margin: 2px;
 }
 
+#PadCellCue {
+    font-size: 14px;
+    font-weight: bold;
+    color: #f39c12;
+    qproperty-alignment: AlignCenter;
+    background-color: #1a1a2e;
+    border: 1px solid #333333;
+    margin: 2px;
+}
+
 #WaveformOverviewA, #WaveformOverviewB {
     border-top: 1px solid #333333;
     border-bottom: 1px solid #333333;

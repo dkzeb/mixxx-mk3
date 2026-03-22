@@ -17,6 +17,7 @@
       <attribute config_key="[Skin],show_mixer">0</attribute>
       <attribute config_key="[Skin],show_pads_loops">0</attribute>
       <attribute config_key="[Skin],show_pads_fx">0</attribute>
+      <attribute config_key="[Skin],show_pads_cues">0</attribute>
     </attributes>
   </manifest>
 
@@ -444,6 +445,64 @@
                 <Label><ObjectName>PadCellAction</ObjectName><SizePolicy>me,me</SizePolicy><Text>FX 2</Text></Label>
                 <Label><ObjectName>PadCellAction</ObjectName><SizePolicy>me,me</SizePolicy><Text>FX 3</Text></Label>
                 <Label><ObjectName>PadCellAction</ObjectName><SizePolicy>me,me</SizePolicy><Text>FX ON</Text></Label>
+              </Children>
+            </WidgetGroup>
+          </Children>
+        </WidgetGroup>
+      </Children>
+    </WidgetGroup>
+
+    <!-- ═══════ PAD INFO: CUEPOINTS (480x272) ═══════ -->
+    <WidgetGroup>
+      <ObjectName>PadPanel</ObjectName>
+      <Size>480,272</Size>
+      <SizePolicy>f,f</SizePolicy>
+      <Layout>vertical</Layout>
+      <Connection>
+        <ConfigKey>[Skin],show_pads_cues</ConfigKey>
+        <BindProperty>visible</BindProperty>
+      </Connection>
+      <Children>
+        <Label><ObjectName>PadTitle</ObjectName><Size>480,20</Size><Text>CUE POINTS</Text></Label>
+        <WidgetGroup>
+          <ObjectName>PadGrid</ObjectName>
+          <SizePolicy>me,me</SizePolicy>
+          <Layout>vertical</Layout>
+          <Children>
+            <WidgetGroup>
+              <SizePolicy>me,me</SizePolicy><Layout>horizontal</Layout>
+              <Children>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 13</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 14</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 15</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 16</Text></Label>
+              </Children>
+            </WidgetGroup>
+            <WidgetGroup>
+              <SizePolicy>me,me</SizePolicy><Layout>horizontal</Layout>
+              <Children>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 9</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 10</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 11</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 12</Text></Label>
+              </Children>
+            </WidgetGroup>
+            <WidgetGroup>
+              <SizePolicy>me,me</SizePolicy><Layout>horizontal</Layout>
+              <Children>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 5</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 6</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 7</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 8</Text></Label>
+              </Children>
+            </WidgetGroup>
+            <WidgetGroup>
+              <SizePolicy>me,me</SizePolicy><Layout>horizontal</Layout>
+              <Children>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 1</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 2</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 3</Text></Label>
+                <Label><ObjectName>PadCellCue</ObjectName><SizePolicy>me,me</SizePolicy><Text>CUE 4</Text></Label>
               </Children>
             </WidgetGroup>
           </Children>
