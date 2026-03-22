@@ -581,23 +581,14 @@ MaschineMK3.onButtonPress = function(name) {
         break;
     // D4/D8: available
 
-    // --- Deck select: select + arrow left/right ---
-    case "select":
-        MaschineMK3.selectPressed = true;
-        break;
+    // --- Deck select: arrow left/right ---
     case "arrowLeft":
-        if (MaschineMK3.selectPressed) {
-            MaschineMK3.activeDeck = 1;
-            MaschineMK3.updateDeckLEDs();
-            print("MK3: Active deck = A");
-        }
+        MaschineMK3.activeDeck = 1;
+        MaschineMK3.updateDeckLEDs();
         break;
     case "arrowRight":
-        if (MaschineMK3.selectPressed) {
-            MaschineMK3.activeDeck = 2;
-            MaschineMK3.updateDeckLEDs();
-            print("MK3: Active deck = B");
-        }
+        MaschineMK3.activeDeck = 2;
+        MaschineMK3.updateDeckLEDs();
         break;
 
     // --- Browser: toggle library panel on the non-active deck's screen ---
@@ -637,9 +628,6 @@ MaschineMK3.onButtonRelease = function(name) {
     switch (name) {
     case "shift":
         MaschineMK3.shiftPressed = false;
-        break;
-    case "select":
-        MaschineMK3.selectPressed = false;
         break;
     case "browserPlugin":
         break;
