@@ -444,14 +444,6 @@ MaschineMK3.processTouchstrip = function(data) {
     var touching = raw > 0;
     var wasTouching = MaschineMK3.touchstripTouched;
 
-    // Visual debug: light up shift LED proportional to touchstrip value
-    if (touching) {
-        var brightness = Math.round((raw / 1024.0) * 63);
-        MaschineMK3.setLed("shift", brightness);
-    } else if (wasTouching && !touching) {
-        MaschineMK3.setLed("shift", 0);
-    }
-
     // Triple-tap detection (3 touches within 800ms → reset crossfader)
     if (touching && !wasTouching) {
         var now = Date.now();
@@ -467,11 +459,27 @@ MaschineMK3.processTouchstrip = function(data) {
         }
     }
 
-    // Map position to crossfader (-1 to +1)
+    // Map position to crossfader (-1 to +1) and update strip LEDs directly
     if (touching && raw !== MaschineMK3.touchstripLastValue) {
         var norm = Math.max(0, Math.min(1, raw / 1024.0));
         var xfader = (norm * 2.0) - 1.0;
         engine.setValue("[Master]", "crossfader", xfader);
+
+        // Update strip LEDs directly (faster than going via crossfader connection)
+        var ledPos = Math.round(norm * 24);
+        var C = MaschineMK3.Color;
+        for (var i = 0; i < 25; i++) {
+            var ledName = "ts" + (i + 1);
+            if (i === ledPos) {
+                MaschineMK3.report81[MaschineMK3.leds[ledName][1]] = C.WHITE;
+            } else if (i === 12) {
+                MaschineMK3.report81[MaschineMK3.leds[ledName][1]] = C.BLUE;
+            } else {
+                MaschineMK3.report81[MaschineMK3.leds[ledName][1]] = C.OFF;
+            }
+        }
+        // Single send for all strip LEDs
+        controller.send(MaschineMK3.report81.slice(1), 42, 0x81);
     }
 
     MaschineMK3.touchstripTouched = touching;
