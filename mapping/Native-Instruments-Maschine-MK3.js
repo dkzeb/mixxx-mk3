@@ -1205,13 +1205,22 @@ MaschineMK3.init = function(/* id, debugging */) {
     engine.makeConnection("[Channel2]", "sync_enabled", function(value) {
         MaschineMK3.setLed("d5", value ? 63 : 16);
     });
-    // PFL (headphone cue) LED feedback
+    // PFL (headphone cue) LED feedback + auto headMix routing
+    MaschineMK3.updateHeadphoneRouting = function() {
+        var anyPfl = engine.getValue("[Channel1]", "pfl") || engine.getValue("[Channel2]", "pfl");
+        // 0 = PFL only, 1 = main only
+        engine.setValue("[Master]", "headMix", anyPfl ? 0 : 1);
+    };
     engine.makeConnection("[Channel1]", "pfl", function(value) {
         MaschineMK3.setLed("d4", value ? 63 : 16);
+        MaschineMK3.updateHeadphoneRouting();
     });
     engine.makeConnection("[Channel2]", "pfl", function(value) {
         MaschineMK3.setLed("d8", value ? 63 : 16);
+        MaschineMK3.updateHeadphoneRouting();
     });
+    // Set initial routing (main mix in headphones)
+    engine.setValue("[Master]", "headMix", 1);
 
     // Dim the D buttons (always available)
     MaschineMK3.setLed("d1", 16);
