@@ -439,35 +439,26 @@ MaschineMK3.updateTouchstripLEDs = function() {
 // Called from parseReport01. Bytes 28-29 are suspected position (16-bit LE).
 // ---------------------------------------------------------------------------
 MaschineMK3.processTouchstrip = function(data) {
-    if (data.length < 42) { return; }
-
-    // DEBUG: scan bytes 28-41 for ANY changes to find the real touchstrip data
+    // DEBUG: scan ALL bytes in the report for changes (find touchstrip)
+    var len = data.length;
     if (!MaschineMK3._tsDebugPrev) {
         MaschineMK3._tsDebugPrev = [];
-        for (var b = 0; b < 42; b++) { MaschineMK3._tsDebugPrev[b] = data[b]; }
+        for (var b = 0; b < len; b++) { MaschineMK3._tsDebugPrev[b] = data[b]; }
+        print("MK3-TS: init, report length=" + len);
         return;
     }
 
     var changed = [];
-    for (var b = 28; b < 42; b++) {
-        if (data[b] !== MaschineMK3._tsDebugPrev[b]) {
-            changed.push("b" + b + "=" + data[b] + "(was " + MaschineMK3._tsDebugPrev[b] + ")");
+    // Skip bytes 1-11 (buttons/stepper) and 12-27 (k1-k8) — we know those
+    for (var b = 28; b < len; b++) {
+        if (b < MaschineMK3._tsDebugPrev.length && data[b] !== MaschineMK3._tsDebugPrev[b]) {
+            changed.push("b" + b + "=" + data[b]);
         }
     }
     if (changed.length > 0) {
-        // Also show 16-bit LE values at common offsets
-        var w28 = (data[29] << 8) | data[28];
-        var w30 = (data[31] << 8) | data[30];
-        var w32 = (data[33] << 8) | data[32];
-        var w34 = (data[35] << 8) | data[34];
-        print("MK3-TS: " + changed.join(" ") +
-              " | w28=" + w28 + " w30=" + w30 + " w32=" + w32 + " w34=" + w34);
+        print("MK3-TS: " + changed.join(" ") + " (len=" + len + ")");
     }
-    for (var b = 0; b < 42; b++) { MaschineMK3._tsDebugPrev[b] = data[b]; }
-
-    // DISABLED: crossfader mapping until we confirm the right bytes
-    // var raw = (data[31] << 8) | data[30];
-    // ...
+    for (var b = 0; b < len; b++) { MaschineMK3._tsDebugPrev[b] = data[b]; }
 };
 
 // ---------------------------------------------------------------------------
@@ -928,6 +919,14 @@ MaschineMK3.incomingData = function(data, length) {
         MaschineMK3.parseReport01(data);
     } else if (reportId === MaschineMK3.PAD_REPORT_ID) {
         MaschineMK3.parseReport02(data);
+    } else {
+        // Log unknown report IDs — touchstrip might be on a different report
+        var hex = "";
+        for (var i = 0; i < Math.min(length, 16); i++) {
+            hex += ("0" + data[i].toString(16)).slice(-2) + " ";
+        }
+        print("MK3-UNKNOWN-REPORT: id=0x" + ("0" + reportId.toString(16)).slice(-2) +
+              " len=" + length + " data=" + hex);
     }
 };
 
