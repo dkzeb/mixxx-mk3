@@ -1,7 +1,7 @@
 [Unit]
 Description=Mixxx DJ Software
-After=sound.target openbox.service wireplumber.service
-Requires=openbox.service wireplumber.service
+After=sound.target openbox.service
+Requires=openbox.service
 
 [Service]
 Type=simple

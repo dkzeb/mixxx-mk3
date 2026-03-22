@@ -167,14 +167,16 @@ echo "--- [7/8] Installing systemd services ---"
 sudo cp "$SCRIPT_DIR/xvfb.service" /etc/systemd/system/
 sudo cp "$SCRIPT_DIR/openbox.service" /etc/systemd/system/
 
-# PipeWire + WirePlumber — patched for this user
+# PipeWire runs as a user-level service (installed by the pipewire package).
+# Enable it for this user so it starts on login/boot.
 UID_NUM=$(id -u "$PI_USER")
-for svc in pipewire.service wireplumber.service; do
-    sed -e "s/User=pi/User=$PI_USER/" \
-        -e "s|/run/user/1000|/run/user/$UID_NUM|" \
-        -e "s/pi:pi/$PI_USER:$PI_USER/" \
-        "$SCRIPT_DIR/$svc" | sudo tee /etc/systemd/system/$svc > /dev/null
-done
+sudo -u "$PI_USER" XDG_RUNTIME_DIR="/run/user/$UID_NUM" systemctl --user enable pipewire.service pipewire.socket wireplumber.service 2>/dev/null || true
+# Ensure user services start at boot without requiring login
+sudo loginctl enable-linger "$PI_USER"
+
+# Remove any stale system-level PipeWire services from previous installs
+sudo systemctl disable pipewire.service wireplumber.service 2>/dev/null || true
+sudo rm -f /etc/systemd/system/pipewire.service /etc/systemd/system/wireplumber.service
 
 # Mixxx — patched for this user (uses pw-jack for PipeWire audio)
 sed -e "s/User=pi/User=$PI_USER/" \
@@ -187,8 +189,6 @@ sudo cp "$SCRIPT_DIR/mk3-screen-daemon.service" /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable xvfb.service
 sudo systemctl enable openbox.service
-sudo systemctl enable pipewire.service
-sudo systemctl enable wireplumber.service
 sudo systemctl enable mk3-screen-daemon.service
 sudo systemctl enable mixxx.service
 
