@@ -102,10 +102,10 @@ MaschineMK3.buttons = {
 // ---------------------------------------------------------------------------
 // Pad hardware-to-physical index map.
 // HW index comes from the pad report (0-15). Physical number is 1-16, laid out:
-//   1  2  3  4   (top row)
-//   5  6  7  8
+//  13 14 15 16   (top row, furthest from you)
 //   9 10 11 12
-//  13 14 15 16   (bottom row)
+//   5  6  7  8
+//   1  2  3  4   (bottom row, closest to you)
 // ---------------------------------------------------------------------------
 MaschineMK3.padHwToPhysical = [13, 14, 15, 16, 9, 10, 11, 12, 5, 6, 7, 8, 1, 2, 3, 4];
 
@@ -298,18 +298,18 @@ MaschineMK3.lastButtonState = {};      // name -> pressed bool, for edge detecti
 MaschineMK3.lastStepperPos  = -1;
 MaschineMK3.lastKnobValue  = {};      // name -> last raw value, for delta tracking
 
-// Loop sizes for 16 pads (top row = short loops, bottom row = long loops)
-// Physical layout:   1  2  3  4    (top row)
-//                    5  6  7  8
+// Loop sizes for 16 pads
+// Physical layout:  13 14 15 16    (top row, furthest from you)
 //                    9 10 11 12
-//                   13 14 15 16    (bottom row)
+//                    5  6  7  8
+//                    1  2  3  4    (bottom row, closest to you)
 MaschineMK3.loopSizes = {
-    1: 0.0625, 2: 0.125, 3: 0.25,  4: 0.5,
-    5: 1,      6: 2,     7: 4,     8: 8,
-    9: 16,    10: 32,   11: 64,   12: 128,
-   13: -1,    14: -2,   15: -3,   16: -4   // negative = special actions
+   13: 0.0625, 14: 0.125, 15: 0.25,  16: 0.5,
+    9: 1,      10: 2,     11: 4,     12: 8,
+    5: 16,      6: 32,     7: 64,     8: 128,
+    1: -1,      2: -2,     3: -3,     4: -4   // negative = special actions
 };
-// Pad 13: loop halve, 14: loop double, 15: reloop/toggle, 16: loop out (exit)
+// Pad 1: loop halve, 2: loop double, 3: reloop/toggle, 4: loop out (exit)
 
 // ---------------------------------------------------------------------------
 // setLed — write a single LED value into the appropriate buffer and send.
@@ -528,19 +528,19 @@ MaschineMK3.updatePadLEDs = function() {
         var color = C.OFF;
 
         if (size > 0) {
-            // Beat loop pad — green if this is the active loop size, dim green otherwise
+            // Beat loop pad — green if this is the active loop size, cyan otherwise
             if (loopEnabled && currentLoopSize === size) {
                 color = C.GREEN;   // active loop
             } else {
                 color = C.CYAN;    // available
             }
         } else {
-            // Special action pads (bottom row)
+            // Special action pads (bottom row, closest to you)
             switch (pad) {
-            case 13: color = loopEnabled ? C.YELLOW : C.OFF; break;  // halve
-            case 14: color = loopEnabled ? C.YELLOW : C.OFF; break;  // double
-            case 15: color = loopEnabled ? C.GREEN : C.ORANGE; break; // reloop
-            case 16: color = loopEnabled ? C.RED : C.OFF; break;     // exit
+            case 1: color = loopEnabled ? C.YELLOW : C.OFF; break;  // halve
+            case 2: color = loopEnabled ? C.YELLOW : C.OFF; break;  // double
+            case 3: color = loopEnabled ? C.GREEN : C.ORANGE; break; // reloop
+            case 4: color = loopEnabled ? C.RED : C.OFF; break;     // exit
             }
         }
 
@@ -787,16 +787,16 @@ MaschineMK3.onPadPress = function(padNumber) {
     } else {
         // Special actions (bottom row)
         switch (padNumber) {
-        case 13: // Loop halve
+        case 1: // Loop halve
             engine.setValue(ch, "loop_halve", 1);
             break;
-        case 14: // Loop double
+        case 2: // Loop double
             engine.setValue(ch, "loop_double", 1);
             break;
-        case 15: // Reloop/toggle
+        case 3: // Reloop/toggle
             engine.setValue(ch, "reloop_toggle", 1);
             break;
-        case 16: // Loop exit
+        case 4: // Loop exit
             engine.setValue(ch, "reloop_toggle", 1);
             break;
         }
