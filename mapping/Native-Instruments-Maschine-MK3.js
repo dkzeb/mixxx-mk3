@@ -1004,7 +1004,6 @@ MaschineMK3.init = function(/* id, debugging */) {
     engine.setValue("[Master]", "headGain", 1.0);
 
     // Set initial LED state
-    MaschineMK3.updateModeLEDs();
     MaschineMK3.updatePadLEDs();
     MaschineMK3.updateDeckLEDs();
 };
