@@ -58,8 +58,9 @@ echo "Mapping installed to: $MIXXX_DIR/"
 rm -rf "$PI_HOME/.mixxx/skins/MK3"
 SKIN_DIR="/usr/share/mixxx/skins/MK3"
 sudo mkdir -p "$SKIN_DIR"
-sudo cp "$PROJECT_DIR/skin/MK3/skin.xml" "$SKIN_DIR/"
-sudo cp "$PROJECT_DIR/skin/MK3/style.qss" "$SKIN_DIR/"
+sudo cp "$PROJECT_DIR/skin/MK3/"*.xml "$SKIN_DIR/"
+sudo cp "$PROJECT_DIR/skin/MK3/"*.qss "$SKIN_DIR/"
+sudo cp "$PROJECT_DIR/skin/MK3/"*.png "$SKIN_DIR/" 2>/dev/null || true
 echo "Skin installed to: $SKIN_DIR/"
 
 # ── 4. Configure Mixxx ──────────────────────────────────────────────

@@ -1,6 +1,7 @@
 build/
 mk3-pi-bundle.zip
-*.png
+# Test/debug screenshots (not skin assets)
+/*.png
 firebase-debug.log
 .firebase/
 .vscode/

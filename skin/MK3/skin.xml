@@ -11,10 +11,10 @@
       <attribute config_key="[App],num_decks">2</attribute>
       <attribute persist="true" config_key="[Skin],active_deck_a">1</attribute>
       <attribute persist="true" config_key="[Skin],active_deck_b">0</attribute>
-      <attribute persist="true" config_key="[Skin],show_library">0</attribute>
-      <attribute persist="true" config_key="[Skin],hide_deck_a">0</attribute>
-      <attribute persist="true" config_key="[Skin],hide_deck_b">0</attribute>
-      <attribute persist="true" config_key="[Skin],show_mixer">0</attribute>
+      <attribute config_key="[Skin],show_library">0</attribute>
+      <attribute config_key="[Skin],hide_deck_a">0</attribute>
+      <attribute config_key="[Skin],hide_deck_b">0</attribute>
+      <attribute config_key="[Skin],show_mixer">0</attribute>
     </attributes>
   </manifest>
 
@@ -171,7 +171,7 @@
         <BindProperty>visible</BindProperty>
       </Connection>
       <Children>
-        <Label><ObjectName>MixerTitle</ObjectName><Size>480,20</Size><Text>MIXER</Text></Label>
+        <Label><ObjectName>MixerTitle</ObjectName><Size>480,18</Size><Text>MIXER</Text></Label>
         <WidgetGroup>
           <SizePolicy>me,me</SizePolicy>
           <Layout>horizontal</Layout>
@@ -184,32 +184,42 @@
               <SizePolicy>f,me</SizePolicy>
               <Layout>vertical</Layout>
               <Children>
-                <Label><ObjectName>MixerChLabel</ObjectName><Size>240,18</Size><Text>DECK A</Text></Label>
+                <Label><ObjectName>MixerChLabel</ObjectName><Size>240,16</Size><Text>DECK A</Text></Label>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>GAIN</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[Channel1],pregain</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>HI</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter3</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>MID</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter2</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>LO</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter1</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>VOL</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[Channel1],volume</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
               </Children>
             </WidgetGroup>
 
@@ -220,32 +230,42 @@
               <SizePolicy>f,me</SizePolicy>
               <Layout>vertical</Layout>
               <Children>
-                <Label><ObjectName>MixerChLabel</ObjectName><Size>240,18</Size><Text>DECK B</Text></Label>
+                <Label><ObjectName>MixerChLabel</ObjectName><Size>240,16</Size><Text>DECK B</Text></Label>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>GAIN</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[Channel2],pregain</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>HI</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter3</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>MID</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter2</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>LO</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter1</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
                 <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,12</Size><Text>VOL</Text></Label>
-                <Number><ObjectName>MixerValue</ObjectName><Size>240,22</Size><SizePolicy>me,f</SizePolicy>
-                  <NumberOfDigits>4</NumberOfDigits>
+                <SliderComposed>
+                  <ObjectName>MixerSlider</ObjectName><Size>200,16</Size><SizePolicy>me,f</SizePolicy>
+                  <Horizontal>true</Horizontal>
+                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
                   <Connection><ConfigKey>[Channel2],volume</ConfigKey></Connection>
-                </Number>
+                </SliderComposed>
               </Children>
             </WidgetGroup>
 

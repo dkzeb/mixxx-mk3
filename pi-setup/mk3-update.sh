@@ -37,8 +37,9 @@ echo "  Mapping updated"
 
 # ── Skin ─────────────────────────────────────────────────────────────
 sudo mkdir -p /usr/share/mixxx/skins/MK3
-sudo cp "$PROJECT_DIR/skin/MK3/skin.xml" /usr/share/mixxx/skins/MK3/
-sudo cp "$PROJECT_DIR/skin/MK3/style.qss" /usr/share/mixxx/skins/MK3/
+sudo cp "$PROJECT_DIR/skin/MK3/"*.xml /usr/share/mixxx/skins/MK3/
+sudo cp "$PROJECT_DIR/skin/MK3/"*.qss /usr/share/mixxx/skins/MK3/
+sudo cp "$PROJECT_DIR/skin/MK3/"*.png /usr/share/mixxx/skins/MK3/ 2>/dev/null || true
 echo "  Skin updated"
 
 # ── Services ─────────────────────────────────────────────────────────
