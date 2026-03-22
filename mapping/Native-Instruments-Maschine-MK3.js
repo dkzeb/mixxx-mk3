@@ -109,6 +109,15 @@ MaschineMK3.buttons = {
 // ---------------------------------------------------------------------------
 MaschineMK3.padHwToPhysical = [13, 14, 15, 16, 9, 10, 11, 12, 5, 6, 7, 8, 1, 2, 3, 4];
 
+// LED names p1-p16 follow HW order (p1=top-left, p16=bottom-right),
+// which is inverted from physical numbering. This maps physical → LED name.
+MaschineMK3.padPhysicalToLed = {
+    1: "p13", 2: "p14", 3: "p15", 4: "p16",   // bottom row
+    5: "p9",  6: "p10", 7: "p11", 8: "p12",
+    9: "p5", 10: "p6", 11: "p7", 12: "p8",
+   13: "p1", 14: "p2", 15: "p3", 16: "p4"     // top row
+};
+
 // ---------------------------------------------------------------------------
 // Knob descriptors: name -> [lsbAddr, msbAddr]
 // Addresses are byte indices within the Report ID 0x01 packet.
@@ -518,7 +527,7 @@ MaschineMK3.updatePadLEDs = function() {
     var currentLoopSize = engine.getValue(ch, "beatloop_size");
 
     for (var pad = 1; pad <= 16; pad++) {
-        var ledName = "p" + pad;
+        var ledName = MaschineMK3.padPhysicalToLed[pad];
         var size = MaschineMK3.loopSizes[pad];
         var color = C.OFF;
 
