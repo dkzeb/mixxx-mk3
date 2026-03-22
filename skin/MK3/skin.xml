@@ -238,11 +238,6 @@
         <BindProperty>visible</BindProperty>
       </Connection>
       <Children>
-        <SearchBox>
-          <ObjectName>LibrarySearch</ObjectName>
-          <Size>480,22</Size>
-          <SizePolicy>me,f</SizePolicy>
-        </SearchBox>
         <Library>
           <ObjectName>LibraryView</ObjectName>
           <SizePolicy>me,me</SizePolicy>
