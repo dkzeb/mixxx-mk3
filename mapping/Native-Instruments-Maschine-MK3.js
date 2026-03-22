@@ -439,36 +439,35 @@ MaschineMK3.updateTouchstripLEDs = function() {
 // Called from parseReport01. Bytes 28-29 are suspected position (16-bit LE).
 // ---------------------------------------------------------------------------
 MaschineMK3.processTouchstrip = function(data) {
-    // Touchstrip position: 16-bit LE at byte offset 30-31, range 0-1024, 0 = released
-    if (data.length < 32) { return; }
-    var raw = (data[31] << 8) | data[30];
-    var touching = raw > 0;
-    var wasTouching = MaschineMK3.touchstripTouched;
+    if (data.length < 42) { return; }
 
-    // Triple-tap detection (3 touches within 800ms → reset crossfader)
-    if (touching && !wasTouching) {
-        var now = Date.now();
-        MaschineMK3.touchstripTapTimes.push(now);
-        while (MaschineMK3.touchstripTapTimes.length > 0 &&
-               now - MaschineMK3.touchstripTapTimes[0] > 800) {
-            MaschineMK3.touchstripTapTimes.shift();
-        }
-        if (MaschineMK3.touchstripTapTimes.length >= 3) {
-            engine.setValue("[Master]", "crossfader", 0);
-            MaschineMK3.updateTouchstripLEDs();
-            MaschineMK3.touchstripTapTimes = [];
-        }
+    // DEBUG: scan bytes 28-41 for ANY changes to find the real touchstrip data
+    if (!MaschineMK3._tsDebugPrev) {
+        MaschineMK3._tsDebugPrev = [];
+        for (var b = 0; b < 42; b++) { MaschineMK3._tsDebugPrev[b] = data[b]; }
+        return;
     }
 
-    // Map position to crossfader (-1 to +1)
-    if (touching && raw !== MaschineMK3.touchstripLastValue) {
-        var norm = Math.max(0, Math.min(1, raw / 1024.0));
-        var xfader = (norm * 2.0) - 1.0;
-        engine.setValue("[Master]", "crossfader", xfader);
+    var changed = [];
+    for (var b = 28; b < 42; b++) {
+        if (data[b] !== MaschineMK3._tsDebugPrev[b]) {
+            changed.push("b" + b + "=" + data[b] + "(was " + MaschineMK3._tsDebugPrev[b] + ")");
+        }
     }
+    if (changed.length > 0) {
+        // Also show 16-bit LE values at common offsets
+        var w28 = (data[29] << 8) | data[28];
+        var w30 = (data[31] << 8) | data[30];
+        var w32 = (data[33] << 8) | data[32];
+        var w34 = (data[35] << 8) | data[34];
+        print("MK3-TS: " + changed.join(" ") +
+              " | w28=" + w28 + " w30=" + w30 + " w32=" + w32 + " w34=" + w34);
+    }
+    for (var b = 0; b < 42; b++) { MaschineMK3._tsDebugPrev[b] = data[b]; }
 
-    MaschineMK3.touchstripTouched = touching;
-    MaschineMK3.touchstripLastValue = raw;
+    // DISABLED: crossfader mapping until we confirm the right bytes
+    // var raw = (data[31] << 8) | data[30];
+    // ...
 };
 
 // ---------------------------------------------------------------------------
