@@ -1311,12 +1311,14 @@ MaschineMK3.init = function(/* id, debugging */) {
         engine.setValue(fxGroup, "clear", 1);
         engine.setValue(fxGroup, "effect_selector", fxSetup[fx].sel);
     }
-    // Route all 4 units to both channels, start dry
+    // Route all 4 units to both channels
+    // mix=1 so effects are audible when individual slots are toggled on
     for (var u = 1; u <= 4; u++) {
         var unitGroup = "[EffectRack1_EffectUnit" + u + "]";
         engine.setValue(unitGroup, "group_[Channel1]_enable", 1);
         engine.setValue(unitGroup, "group_[Channel2]_enable", 1);
-        engine.setValue(unitGroup, "mix", 0);
+        engine.setValue(unitGroup, "mix", 1);
+        engine.setValue(unitGroup, "enabled", 1);
     }
 
     // Set initial LED state
