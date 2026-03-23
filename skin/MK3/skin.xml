@@ -281,125 +281,137 @@
           <Layout>horizontal</Layout>
           <Children>
 
-            <!-- Deck A strip -->
+            <!-- Deck A strip: sliders left, VU right -->
             <WidgetGroup>
               <ObjectName>MixerStripA</ObjectName>
               <Size>240,0</Size>
               <SizePolicy>f,me</SizePolicy>
-              <Layout>vertical</Layout>
+              <Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>MixerChLabel</ObjectName><Size>240,14</Size><Text>DECK A</Text></Label>
-                <!-- VU Meter -->
+                <!-- Sliders column -->
+                <WidgetGroup>
+                  <SizePolicy>me,me</SizePolicy>
+                  <Layout>vertical</Layout>
+                  <Children>
+                    <Label><ObjectName>MixerChLabel</ObjectName><Size>0,14</Size><Text>DECK A</Text></Label>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K1: HI</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter3</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K2: MID</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter2</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K3: LO</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter1</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K4: VOL</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[Channel1],volume</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>GAIN</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[Channel1],pregain</ConfigKey></Connection>
+                    </SliderComposed>
+                  </Children>
+                </WidgetGroup>
+                <!-- VU Meter (right side of Deck A) -->
                 <VuMeter>
                   <ObjectName>VuMeterA</ObjectName>
-                  <Size>200,8</Size>
-                  <SizePolicy>me,f</SizePolicy>
-                  <PathVu>skin:vu_fill.png</PathVu>
-                  <PathBack>skin:vu_bg.png</PathBack>
-                  <Horizontal>true</Horizontal>
+                  <Size>10,0</Size>
+                  <SizePolicy>f,me</SizePolicy>
+                  <PathVu>skin:vu_fill_v.png</PathVu>
+                  <PathBack>skin:vu_bg_v.png</PathBack>
+                  <Horizontal>false</Horizontal>
                   <PeakHoldSize>3</PeakHoldSize>
                   <PeakHoldTime>500</PeakHoldTime>
                   <PeakFallTime>50</PeakFallTime>
                   <PeakFallStep>2</PeakFallStep>
                   <Connection><ConfigKey>[Channel1],vu_meter</ConfigKey></Connection>
                 </VuMeter>
-                <!-- Knob labels: K1=HI K2=MID K3=LO K4=VOL -->
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K1: HI</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter3</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K2: MID</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter2</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K3: LO</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter1</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K4: VOL</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[Channel1],volume</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>GAIN</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[Channel1],pregain</ConfigKey></Connection>
-                </SliderComposed>
               </Children>
             </WidgetGroup>
 
-            <!-- Deck B strip -->
+            <!-- Deck B strip: VU left, sliders right -->
             <WidgetGroup>
               <ObjectName>MixerStripB</ObjectName>
               <Size>240,0</Size>
               <SizePolicy>f,me</SizePolicy>
-              <Layout>vertical</Layout>
+              <Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>MixerChLabel</ObjectName><Size>240,14</Size><Text>DECK B</Text></Label>
-                <!-- VU Meter -->
+                <!-- VU Meter (left side of Deck B) -->
                 <VuMeter>
                   <ObjectName>VuMeterB</ObjectName>
-                  <Size>200,8</Size>
-                  <SizePolicy>me,f</SizePolicy>
-                  <PathVu>skin:vu_fill.png</PathVu>
-                  <PathBack>skin:vu_bg.png</PathBack>
-                  <Horizontal>true</Horizontal>
+                  <Size>10,0</Size>
+                  <SizePolicy>f,me</SizePolicy>
+                  <PathVu>skin:vu_fill_v.png</PathVu>
+                  <PathBack>skin:vu_bg_v.png</PathBack>
+                  <Horizontal>false</Horizontal>
                   <PeakHoldSize>3</PeakHoldSize>
                   <PeakHoldTime>500</PeakHoldTime>
                   <PeakFallTime>50</PeakFallTime>
                   <PeakFallStep>2</PeakFallStep>
                   <Connection><ConfigKey>[Channel2],vu_meter</ConfigKey></Connection>
                 </VuMeter>
-                <!-- Knob labels: K5=HI K6=MID K7=LO K8=VOL -->
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K5: HI</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter3</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K6: MID</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter2</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K7: LO</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter1</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>K8: VOL</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[Channel2],volume</ConfigKey></Connection>
-                </SliderComposed>
-                <Label><ObjectName>MixerKnobLabel</ObjectName><Size>240,10</Size><Text>GAIN</Text></Label>
-                <SliderComposed>
-                  <ObjectName>MixerSlider</ObjectName><Size>200,14</Size><SizePolicy>me,f</SizePolicy>
-                  <Horizontal>true</Horizontal>
-                  <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
-                  <Connection><ConfigKey>[Channel2],pregain</ConfigKey></Connection>
-                </SliderComposed>
+                <!-- Sliders column -->
+                <WidgetGroup>
+                  <SizePolicy>me,me</SizePolicy>
+                  <Layout>vertical</Layout>
+                  <Children>
+                    <Label><ObjectName>MixerChLabel</ObjectName><Size>0,14</Size><Text>DECK B</Text></Label>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K5: HI</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter3</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K6: MID</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter2</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K7: LO</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter1</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>K8: VOL</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[Channel2],volume</ConfigKey></Connection>
+                    </SliderComposed>
+                    <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,10</Size><Text>GAIN</Text></Label>
+                    <SliderComposed>
+                      <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+                      <Horizontal>true</Horizontal>
+                      <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+                      <Connection><ConfigKey>[Channel2],pregain</ConfigKey></Connection>
+                    </SliderComposed>
+                  </Children>
+                </WidgetGroup>
               </Children>
             </WidgetGroup>
 
