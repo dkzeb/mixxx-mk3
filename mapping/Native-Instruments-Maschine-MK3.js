@@ -1206,6 +1206,14 @@ MaschineMK3.onKnobChange = function(name, value) {
 // direction: positive = clockwise, negative = counter-clockwise.
 // ---------------------------------------------------------------------------
 MaschineMK3.onStepperChange = function(direction) {
+    if (MaschineMK3.settingsVisible) {
+        // Stepper scrolls settings cursor
+        MaschineMK3.settingsConfirm = false;
+        MaschineMK3.settingsCursor = MaschineMK3.settingsNextSelectable(
+            MaschineMK3.settingsTab, MaschineMK3.settingsCursor, direction > 0 ? 1 : -1);
+        MaschineMK3.updateSettingsSkinCOs();
+        return;
+    }
     if (direction > 0) {
         engine.setValue("[Library]", "MoveDown", 1);
         engine.setValue("[Library]", "MoveDown", 0);
