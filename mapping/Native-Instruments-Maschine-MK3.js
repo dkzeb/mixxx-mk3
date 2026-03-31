@@ -504,6 +504,42 @@ MaschineMK3.updatePanels = function() {
 };
 
 // ---------------------------------------------------------------------------
+// updateSettingsSkinCOs — push settings state to skin COs for display.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateSettingsSkinCOs = function() {
+    // Tab visibility
+    for (var t = 0; t < 3; t++) {
+        engine.setValue("[Skin]", "settings_tab_" + t, MaschineMK3.settingsTab === t ? 1 : 0);
+    }
+    // Cursor position (max 6 items per tab)
+    for (var c = 0; c < 6; c++) {
+        engine.setValue("[Skin]", "settings_cursor_" + c, MaschineMK3.settingsCursor === c ? 1 : 0);
+    }
+    // Confirmation mode
+    engine.setValue("[Skin]", "settings_confirming", MaschineMK3.settingsConfirm ? 1 : 0);
+    // Toggle states
+    engine.setValue("[Skin]", "settings_autoupdate", MaschineMK3.settingsAutoUpdate ? 1 : 0);
+    engine.setValue("[Skin]", "settings_tailscale", MaschineMK3.settingsTailscale ? 1 : 0);
+    engine.setValue("[Skin]", "settings_hotspot", MaschineMK3.settingsHotspot ? 1 : 0);
+};
+
+// ---------------------------------------------------------------------------
+// updateSettingsLEDs — set D-button LEDs for settings tabs.
+// Active tab = bright, other tabs = dim, unused D4/D8 = off.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateSettingsLEDs = function() {
+    var offset = (MaschineMK3.activeDeck === 1) ? 5 : 1; // D5-D8 or D1-D4
+    for (var i = 0; i < 4; i++) {
+        var dName = "d" + (offset + i);
+        if (i < 3) {
+            MaschineMK3.setLed(dName, MaschineMK3.settingsTab === i ? 63 : 16);
+        } else {
+            MaschineMK3.setLed(dName, 0);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
 // connectTransportLEDs — connect/reconnect transport LED feedback to the
 // active deck. Called on init and when switching decks.
 // ---------------------------------------------------------------------------
@@ -795,36 +831,43 @@ MaschineMK3.onButtonPress = function(name) {
         MaschineMK3.updatePanels();
         break;
 
-    // --- D buttons: per-deck controls (D1-D4 = Deck A, D5-D8 = Deck B) ---
-    // D1/D5: Sync
-    case "d1":
-        engine.setValue("[Channel1]", "sync_enabled",
-            engine.getValue("[Channel1]", "sync_enabled") ? 0 : 1);
-        break;
-    case "d5":
-        engine.setValue("[Channel2]", "sync_enabled",
-            engine.getValue("[Channel2]", "sync_enabled") ? 0 : 1);
-        break;
-    // D2/D6: Tempo nudge down (momentary)
-    case "d2":
-        engine.setValue("[Channel1]", "rate_temp_down", 1);
-        break;
-    case "d6":
-        engine.setValue("[Channel2]", "rate_temp_down", 1);
-        break;
-    // D3/D7: Tempo nudge up (momentary)
-    case "d3":
-        engine.setValue("[Channel1]", "rate_temp_up", 1);
-        break;
-    case "d7":
-        engine.setValue("[Channel2]", "rate_temp_up", 1);
-        break;
-    // D4/D8: headphone cue (PFL) toggle
-    case "d4":
-        engine.setValue("[Channel1]", "pfl", engine.getValue("[Channel1]", "pfl") ? 0 : 1);
-        break;
-    case "d8":
-        engine.setValue("[Channel2]", "pfl", engine.getValue("[Channel2]", "pfl") ? 0 : 1);
+    // --- D buttons: settings tabs when settings open, else per-deck controls ---
+    case "d1": case "d2": case "d3": case "d4":
+    case "d5": case "d6": case "d7": case "d8":
+        var dNum = parseInt(name.charAt(1), 10);  // 1-8
+        if (MaschineMK3.settingsVisible) {
+            // D buttons on the settings screen side act as tab selectors
+            var settingsOffset = (MaschineMK3.activeDeck === 1) ? 5 : 1;
+            var tabIdx = dNum - settingsOffset;
+            if (tabIdx >= 0 && tabIdx < 3) {
+                MaschineMK3.settingsTab = tabIdx;
+                MaschineMK3.settingsCursor = MaschineMK3.settingsFirstSelectable(tabIdx);
+                MaschineMK3.settingsConfirm = false;
+                MaschineMK3.updateSettingsLEDs();
+                MaschineMK3.updateSettingsSkinCOs();
+            }
+            break;
+        }
+        // Normal DJ mode D-button behavior
+        if (dNum === 1) {
+            engine.setValue("[Channel1]", "sync_enabled",
+                engine.getValue("[Channel1]", "sync_enabled") ? 0 : 1);
+        } else if (dNum === 5) {
+            engine.setValue("[Channel2]", "sync_enabled",
+                engine.getValue("[Channel2]", "sync_enabled") ? 0 : 1);
+        } else if (dNum === 2) {
+            engine.setValue("[Channel1]", "rate_temp_down", 1);
+        } else if (dNum === 6) {
+            engine.setValue("[Channel2]", "rate_temp_down", 1);
+        } else if (dNum === 3) {
+            engine.setValue("[Channel1]", "rate_temp_up", 1);
+        } else if (dNum === 7) {
+            engine.setValue("[Channel2]", "rate_temp_up", 1);
+        } else if (dNum === 4) {
+            engine.setValue("[Channel1]", "pfl", engine.getValue("[Channel1]", "pfl") ? 0 : 1);
+        } else if (dNum === 8) {
+            engine.setValue("[Channel2]", "pfl", engine.getValue("[Channel2]", "pfl") ? 0 : 1);
+        }
         break;
 
     // --- Deck select: arrow left/right ---
@@ -871,11 +914,16 @@ MaschineMK3.onButtonPress = function(name) {
         if (MaschineMK3.settingsVisible) {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsTab = 0;
+            MaschineMK3.settingsCursor = MaschineMK3.settingsFirstSelectable(0);
+            MaschineMK3.settingsConfirm = false;
+            MaschineMK3.updateSettingsLEDs();
         }
         if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
+        MaschineMK3.updateSettingsSkinCOs();
         break;
 
     // --- Library navigation (4D encoder) ---
@@ -936,18 +984,18 @@ MaschineMK3.onButtonRelease = function(name) {
     case "recCountIn":
         engine.setValue("[Channel" + MaschineMK3.activeDeck + "]", "cue_default", 0);
         break;
-    // D button releases — tempo nudge (momentary)
+    // D button releases — tempo nudge (momentary), skip if settings open
     case "d2":
-        engine.setValue("[Channel1]", "rate_temp_down", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel1]", "rate_temp_down", 0); }
         break;
     case "d3":
-        engine.setValue("[Channel1]", "rate_temp_up", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel1]", "rate_temp_up", 0); }
         break;
     case "d6":
-        engine.setValue("[Channel2]", "rate_temp_down", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel2]", "rate_temp_down", 0); }
         break;
     case "d7":
-        engine.setValue("[Channel2]", "rate_temp_up", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel2]", "rate_temp_up", 0); }
         break;
     // Library nav pulses
     case "navUp":
