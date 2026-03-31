@@ -506,105 +506,105 @@
           <Connection><ConfigKey>[Skin],settings_tab_0</ConfigKey><BindProperty>visible</BindProperty></Connection>
           <Children>
             <!-- Item 0: Reboot (action, confirm) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
               <!-- Normal -->
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_0</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Reboot</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Reboot</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
               <!-- Highlighted -->
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_0</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
                   <!-- Normal highlight (not confirming) -->
                   <WidgetGroup><SizePolicy>me,f</SizePolicy><Layout>horizontal</Layout>
                     <Connection><ConfigKey>[Skin],settings_confirming</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                     <Children>
-                      <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Reboot</Text></Label>
-                      <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                      <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Reboot</Text></Label>
+                      <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                     </Children>
                   </WidgetGroup>
                   <!-- Confirming -->
-                  <Label><ObjectName>SettingsConfirm</ObjectName><Size>480,38</Size><Text>Are you sure? Push to confirm</Text>
+                  <Label><ObjectName>SettingsConfirm</ObjectName><Size>480,26</Size><Text>Are you sure? Push to confirm</Text>
                     <Connection><ConfigKey>[Skin],settings_confirming</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 1: Shutdown (action, confirm) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_1</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Shutdown</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Shutdown</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_1</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
                   <WidgetGroup><SizePolicy>me,f</SizePolicy><Layout>horizontal</Layout>
                     <Connection><ConfigKey>[Skin],settings_confirming</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                     <Children>
-                      <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Shutdown</Text></Label>
-                      <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                      <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Shutdown</Text></Label>
+                      <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                     </Children>
                   </WidgetGroup>
-                  <Label><ObjectName>SettingsConfirm</ObjectName><Size>480,38</Size><Text>Are you sure? Push to confirm</Text>
+                  <Label><ObjectName>SettingsConfirm</ObjectName><Size>480,26</Size><Text>Are you sure? Push to confirm</Text>
                     <Connection><ConfigKey>[Skin],settings_confirming</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 2: Check for Updates (action) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_2</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Check for Updates</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Check for Updates</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_2</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Check for Updates</Text></Label>
-                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Check for Updates</Text></Label>
+                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 3: Auto-update on boot (toggle) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_3</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Auto-update on boot</Text></Label>
-                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,38</Size><Text>ON</Text>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Auto-update on boot</Text></Label>
+                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,26</Size><Text>ON</Text>
                     <Connection><ConfigKey>[Skin],settings_autoupdate</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
-                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,38</Size><Text>OFF</Text>
+                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,26</Size><Text>OFF</Text>
                     <Connection><ConfigKey>[Skin],settings_autoupdate</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_3</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Auto-update on boot</Text></Label>
-                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,38</Size><Text>ON</Text>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Auto-update on boot</Text></Label>
+                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,26</Size><Text>ON</Text>
                     <Connection><ConfigKey>[Skin],settings_autoupdate</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
-                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,38</Size><Text>OFF</Text>
+                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,26</Size><Text>OFF</Text>
                     <Connection><ConfigKey>[Skin],settings_autoupdate</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 4: Version (info) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Version</Text></Label>
+                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Version</Text></Label>
               </Children>
             </WidgetGroup>
           </Children>
@@ -617,63 +617,63 @@
           <Connection><ConfigKey>[Skin],settings_tab_1</ConfigKey><BindProperty>visible</BindProperty></Connection>
           <Children>
             <!-- Item 0: Rescan Library (action) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_0</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Rescan Library</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Rescan Library</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_0</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Rescan Library</Text></Label>
-                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Rescan Library</Text></Label>
+                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 1: Mount USB Drive (action) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_1</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Mount USB Drive</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Mount USB Drive</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_1</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Mount USB Drive</Text></Label>
-                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Mount USB Drive</Text></Label>
+                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 2: Unmount USB Drive (action) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_2</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Unmount USB Drive</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Unmount USB Drive</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_2</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Unmount USB Drive</Text></Label>
-                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Unmount USB Drive</Text></Label>
+                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 3: Library Location (info) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Library Location</Text></Label>
+                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Library Location</Text></Label>
               </Children>
             </WidgetGroup>
           </Children>
@@ -686,87 +686,87 @@
           <Connection><ConfigKey>[Skin],settings_tab_2</ConfigKey><BindProperty>visible</BindProperty></Connection>
           <Children>
             <!-- Item 0: IP Address (info) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>IP Address</Text></Label>
+                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>IP Address</Text></Label>
               </Children>
             </WidgetGroup>
 
             <!-- Item 1: Hostname (info) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Hostname</Text></Label>
+                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Hostname</Text></Label>
               </Children>
             </WidgetGroup>
 
             <!-- Item 2: WiFi Network (info) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
               <Children>
-                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>WiFi Network</Text></Label>
+                <Label><ObjectName>SettingsItemInfo</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>WiFi Network</Text></Label>
               </Children>
             </WidgetGroup>
 
             <!-- Item 3: WiFi Select (action) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_3</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>WiFi Select</Text></Label>
-                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>WiFi Select</Text></Label>
+                  <Label><ObjectName>SettingsChevron</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_3</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>WiFi Select</Text></Label>
-                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,38</Size><Text>›</Text></Label>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>WiFi Select</Text></Label>
+                  <Label><ObjectName>SettingsChevronHighlight</ObjectName><Size>40,26</Size><Text>›</Text></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 4: Tailscale (toggle) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_4</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Tailscale</Text></Label>
-                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,38</Size><Text>ON</Text>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Tailscale</Text></Label>
+                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,26</Size><Text>ON</Text>
                     <Connection><ConfigKey>[Skin],settings_tailscale</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
-                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,38</Size><Text>OFF</Text>
+                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,26</Size><Text>OFF</Text>
                     <Connection><ConfigKey>[Skin],settings_tailscale</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_4</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Tailscale</Text></Label>
-                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,38</Size><Text>ON</Text>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Tailscale</Text></Label>
+                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,26</Size><Text>ON</Text>
                     <Connection><ConfigKey>[Skin],settings_tailscale</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
-                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,38</Size><Text>OFF</Text>
+                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,26</Size><Text>OFF</Text>
                     <Connection><ConfigKey>[Skin],settings_tailscale</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
                 </Children>
               </WidgetGroup>
             </Children></WidgetGroup>
 
             <!-- Item 5: Hotspot (toggle) -->
-            <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Children>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+            <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Children>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_5</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Hotspot</Text></Label>
-                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,38</Size><Text>ON</Text>
+                  <Label><ObjectName>SettingsItem</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Hotspot</Text></Label>
+                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,26</Size><Text>ON</Text>
                     <Connection><ConfigKey>[Skin],settings_hotspot</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
-                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,38</Size><Text>OFF</Text>
+                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,26</Size><Text>OFF</Text>
                     <Connection><ConfigKey>[Skin],settings_hotspot</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
                 </Children>
               </WidgetGroup>
-              <WidgetGroup><Size>480,38</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
+              <WidgetGroup><Size>480,26</Size><SizePolicy>f,f</SizePolicy><Layout>horizontal</Layout>
                 <Connection><ConfigKey>[Skin],settings_cursor_5</ConfigKey><BindProperty>visible</BindProperty></Connection>
                 <Children>
-                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,38</Size><Text>Hotspot</Text></Label>
-                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,38</Size><Text>ON</Text>
+                  <Label><ObjectName>SettingsItemHighlight</ObjectName><SizePolicy>me,f</SizePolicy><Size>0,26</Size><Text>Hotspot</Text></Label>
+                  <Label><ObjectName>SettingsToggleOn</ObjectName><Size>50,26</Size><Text>ON</Text>
                     <Connection><ConfigKey>[Skin],settings_hotspot</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
-                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,38</Size><Text>OFF</Text>
+                  <Label><ObjectName>SettingsToggleOff</ObjectName><Size>50,26</Size><Text>OFF</Text>
                     <Connection><ConfigKey>[Skin],settings_hotspot</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
                 </Children>
               </WidgetGroup>
