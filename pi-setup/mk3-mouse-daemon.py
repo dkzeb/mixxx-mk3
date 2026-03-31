@@ -99,7 +99,7 @@ class MouseController:
 
     def move(self, dx, dy):
         """Move cursor relative to current position."""
-        subprocess.Popen(
+        subprocess.run(
             ["xdotool", "mousemove_relative", "--", str(dx), str(dy)],
             env=self._env,
             stdout=subprocess.DEVNULL,
@@ -108,7 +108,7 @@ class MouseController:
 
     def click(self, button=1):
         """Click a mouse button (1=left, 3=right)."""
-        subprocess.Popen(
+        subprocess.run(
             ["xdotool", "click", str(button)],
             env=self._env,
             stdout=subprocess.DEVNULL,
