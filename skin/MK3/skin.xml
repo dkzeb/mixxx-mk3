@@ -20,6 +20,7 @@
       <attribute config_key="[Skin],show_pads_fx">0</attribute>
       <attribute config_key="[Skin],show_pads_cues">0</attribute>
       <attribute config_key="[Skin],show_t9">0</attribute>
+      <attribute config_key="[Skin],show_settings">0</attribute>
     </attributes>
   </manifest>
 
@@ -437,6 +438,72 @@
             <ConfigKey>[Master],crossfader</ConfigKey>
           </Connection>
         </SliderComposed>
+      </Children>
+    </WidgetGroup>
+
+    <!-- ═══════ SETTINGS PANEL (480x272) ═══════ -->
+    <WidgetGroup>
+      <ObjectName>SettingsPanel</ObjectName>
+      <Size>480,272</Size>
+      <SizePolicy>f,f</SizePolicy>
+      <Layout>vertical</Layout>
+      <Connection>
+        <ConfigKey>[Skin],show_settings</ConfigKey>
+        <BindProperty>visible</BindProperty>
+      </Connection>
+      <Children>
+        <Label><ObjectName>MixerTitle</ObjectName><Size>480,16</Size><Text>SETTINGS</Text></Label>
+
+        <WidgetGroup>
+          <SizePolicy>me,me</SizePolicy>
+          <Layout>vertical</Layout>
+          <Children>
+            <!-- Master Gain -->
+            <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,12</Size><Text>MASTER VOLUME</Text></Label>
+            <SliderComposed>
+              <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+              <Horizontal>true</Horizontal>
+              <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+              <Connection><ConfigKey>[Master],gain</ConfigKey></Connection>
+            </SliderComposed>
+
+            <!-- Headphone Gain -->
+            <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,12</Size><Text>HEADPHONE VOLUME</Text></Label>
+            <SliderComposed>
+              <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+              <Horizontal>true</Horizontal>
+              <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+              <Connection><ConfigKey>[Master],headGain</ConfigKey></Connection>
+            </SliderComposed>
+
+            <!-- Crossfader Curve -->
+            <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,12</Size><Text>CROSSFADER CURVE</Text></Label>
+            <SliderComposed>
+              <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+              <Horizontal>true</Horizontal>
+              <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+              <Connection><ConfigKey>[Mixer Profile],xFaderCurve</ConfigKey></Connection>
+            </SliderComposed>
+
+            <!-- Deck A Gain -->
+            <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,12</Size><Text>DECK A GAIN</Text></Label>
+            <SliderComposed>
+              <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+              <Horizontal>true</Horizontal>
+              <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+              <Connection><ConfigKey>[Channel1],pregain</ConfigKey></Connection>
+            </SliderComposed>
+
+            <!-- Deck B Gain -->
+            <Label><ObjectName>MixerKnobLabel</ObjectName><Size>0,12</Size><Text>DECK B GAIN</Text></Label>
+            <SliderComposed>
+              <ObjectName>MixerSlider</ObjectName><Size>0,14</Size><SizePolicy>me,f</SizePolicy>
+              <Horizontal>true</Horizontal>
+              <Handle>skin:slider_handle.png</Handle><Slider>skin:slider_bg.png</Slider>
+              <Connection><ConfigKey>[Channel2],pregain</ConfigKey></Connection>
+            </SliderComposed>
+          </Children>
+        </WidgetGroup>
       </Children>
     </WidgetGroup>
 

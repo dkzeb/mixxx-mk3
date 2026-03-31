@@ -300,8 +300,9 @@ MaschineMK3.touchstripTouched = false;      // whether strip is being touched
 MaschineMK3.shiftPressed  = false;
 MaschineMK3.selectPressed = false;     // "select" button held = modifier for deck switching
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
-MaschineMK3.libraryVisible = false;    // whether the library panel is shown
-MaschineMK3.mixerVisible   = false;    // whether the mixer panel is shown
+MaschineMK3.libraryVisible  = false;    // whether the library panel is shown
+MaschineMK3.mixerVisible    = false;    // whether the mixer panel is shown
+MaschineMK3.settingsVisible = false;    // whether the settings panel is shown
 MaschineMK3.padMode       = null;      // null | "loops" | "effects" | "cuepoints" | "t9" — null = pads inactive
 
 // Effects pad mapping: pad number → {unit, slot} or {unit, "enable"}
@@ -407,14 +408,16 @@ MaschineMK3.updateLibrary = function() {
 MaschineMK3.updatePanels = function() {
     var showLib = MaschineMK3.libraryVisible;
     var showMix = MaschineMK3.mixerVisible;
-    var noPanelOpen = !showLib && !showMix;
+    var showSet = MaschineMK3.settingsVisible;
+    var noPanelOpen = !showLib && !showMix && !showSet;
     var showPadsLoops = noPanelOpen && MaschineMK3.padMode === "loops";
     var showPadsFx = noPanelOpen && MaschineMK3.padMode === "effects";
     var showPadsCues = noPanelOpen && MaschineMK3.padMode === "cuepoints";
-    var anyPanel = showLib || showMix || showPadsLoops || showPadsFx || showPadsCues;
+    var anyPanel = showLib || showMix || showSet || showPadsLoops || showPadsFx || showPadsCues;
 
     engine.setValue("[Skin]", "show_library", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_mixer", showMix ? 1 : 0);
+    engine.setValue("[Skin]", "show_settings", showSet ? 1 : 0);
     engine.setValue("[Skin]", "show_t9", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_loops", showPadsLoops ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_fx", showPadsFx ? 1 : 0);
@@ -432,6 +435,7 @@ MaschineMK3.updatePanels = function() {
 
     MaschineMK3.setLed("browserPlugin", showLib ? 63 : 16);
     MaschineMK3.setLed("mixer", showMix ? 63 : 16);
+    MaschineMK3.setLed("settings", showSet ? 63 : 16);
 
     if (showLib) {
         // focused_widget: 0=none, 1=search bar, 2=sidebar, 3=track table
@@ -704,6 +708,7 @@ MaschineMK3.onButtonPress = function(name) {
         if (MaschineMK3.padMode === "cuepoints") {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsVisible = false;
         }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
@@ -719,10 +724,11 @@ MaschineMK3.onButtonPress = function(name) {
             // Normal press: toggle loops mode on/off
             MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? null : "loops";
         }
-        // Close library/mixer if opening a pad mode
+        // Close library/mixer/settings if opening a pad mode
         if (MaschineMK3.padMode !== null) {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsVisible = false;
         }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
@@ -776,6 +782,7 @@ MaschineMK3.onButtonPress = function(name) {
         MaschineMK3.libraryVisible = !MaschineMK3.libraryVisible;
         if (MaschineMK3.libraryVisible) {
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsVisible = false;
             MaschineMK3.padMode = "t9";
         } else {
             MaschineMK3.padMode = null;
@@ -788,7 +795,23 @@ MaschineMK3.onButtonPress = function(name) {
     // --- Mixer: toggle mixer panel ---
     case "mixer":
         MaschineMK3.mixerVisible = !MaschineMK3.mixerVisible;
-        if (MaschineMK3.mixerVisible) { MaschineMK3.libraryVisible = false; }
+        if (MaschineMK3.mixerVisible) {
+            MaschineMK3.libraryVisible = false;
+            MaschineMK3.settingsVisible = false;
+        }
+        if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
+        MaschineMK3.updatePadModeLED();
+        MaschineMK3.updatePadLEDs();
+        MaschineMK3.updatePanels();
+        break;
+
+    // --- Settings: toggle settings panel ---
+    case "settings":
+        MaschineMK3.settingsVisible = !MaschineMK3.settingsVisible;
+        if (MaschineMK3.settingsVisible) {
+            MaschineMK3.libraryVisible = false;
+            MaschineMK3.mixerVisible = false;
+        }
         if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
