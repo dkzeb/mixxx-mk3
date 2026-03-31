@@ -21,6 +21,19 @@
       <attribute config_key="[Skin],show_pads_cues">0</attribute>
       <attribute config_key="[Skin],show_t9">0</attribute>
       <attribute config_key="[Skin],show_settings">0</attribute>
+      <attribute config_key="[Skin],settings_tab_0">1</attribute>
+      <attribute config_key="[Skin],settings_tab_1">0</attribute>
+      <attribute config_key="[Skin],settings_tab_2">0</attribute>
+      <attribute config_key="[Skin],settings_cursor_0">1</attribute>
+      <attribute config_key="[Skin],settings_cursor_1">0</attribute>
+      <attribute config_key="[Skin],settings_cursor_2">0</attribute>
+      <attribute config_key="[Skin],settings_cursor_3">0</attribute>
+      <attribute config_key="[Skin],settings_cursor_4">0</attribute>
+      <attribute config_key="[Skin],settings_cursor_5">0</attribute>
+      <attribute config_key="[Skin],settings_confirming">0</attribute>
+      <attribute config_key="[Skin],settings_autoupdate">0</attribute>
+      <attribute config_key="[Skin],settings_tailscale">0</attribute>
+      <attribute config_key="[Skin],settings_hotspot">0</attribute>
     </attributes>
   </manifest>
 
