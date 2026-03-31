@@ -196,12 +196,11 @@ def parse_pad_report(data):
         if offset + 3 > len(data):
             break
         hw_index = data[offset]
-        if hw_index == 0:
-            break
+        if hw_index >= PAD_COUNT:
+            break  # sentinel / end of list
         pressure = data[offset + 1] | (data[offset + 2] << 8)
-        if 1 <= hw_index <= PAD_COUNT:
-            physical = HW_TO_PHYSICAL[hw_index - 1]
-            pads[physical] = pressure
+        physical = HW_TO_PHYSICAL[hw_index]
+        pads[physical] = pressure
         offset += 3
     return pads
 
