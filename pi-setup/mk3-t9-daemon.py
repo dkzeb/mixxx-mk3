@@ -5,7 +5,7 @@ Reads pad presses from hidraw, drives pad LEDs, and injects keystrokes
 via xdotool to control Mixxx's library search. Runs as a systemd
 service alongside Mixxx.
 
-Toggle T9 mode with the keyboard button (byte 0x04, mask 0x02).
+Toggle T9 mode with the browserPlugin button (byte 0x08, mask 0x04).
 """
 import importlib.util
 import glob
@@ -37,9 +37,9 @@ PRODUCT_ID = "1600"
 
 LOG_PREFIX = "mk3-t9-daemon"
 
-# Keyboard button: Report 0x01, byte 0x04, mask 0x02
-KEYBOARD_BYTE = 0x04
-KEYBOARD_MASK = 0x02
+# browserPlugin button: Report 0x01, byte 0x08, mask 0x04
+TOGGLE_BYTE = 0x08
+TOGGLE_MASK = 0x04
 
 # Pad HID report
 PAD_REPORT_ID = 0x02
@@ -230,7 +230,7 @@ def main():
 
         leds = LedWriter(fd)
         t9_active = False
-        keyboard_was_pressed = False
+        toggle_was_pressed = False
         pad_was_pressed = {}  # physical pad -> bool
 
         engine = None
@@ -281,10 +281,10 @@ def main():
                 report_id = data[0]
 
                 # --- Report 0x01: check keyboard button ---
-                if report_id == 0x01 and len(data) > KEYBOARD_BYTE:
-                    pressed = (data[KEYBOARD_BYTE] & KEYBOARD_MASK) != 0
+                if report_id == 0x01 and len(data) > TOGGLE_BYTE:
+                    pressed = (data[TOGGLE_BYTE] & TOGGLE_MASK) != 0
 
-                    if pressed and not keyboard_was_pressed:
+                    if pressed and not toggle_was_pressed:
                         t9_active = not t9_active
 
                         if t9_active:
@@ -302,7 +302,7 @@ def main():
                             leds.send()
                             pad_was_pressed.clear()
 
-                    keyboard_was_pressed = pressed
+                    toggle_was_pressed = pressed
 
                 # --- Report 0x02: pad presses ---
                 if report_id == PAD_REPORT_ID and t9_active and engine:

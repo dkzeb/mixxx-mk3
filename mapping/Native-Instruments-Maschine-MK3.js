@@ -764,10 +764,17 @@ MaschineMK3.onButtonPress = function(name) {
         MaschineMK3.updateDeckLEDs();
         break;
 
-    // --- Browser: toggle library panel on the non-active deck's screen ---
+    // --- Browser: toggle library panel + T9 input on the non-active deck's screen ---
     case "browserPlugin":
         MaschineMK3.libraryVisible = !MaschineMK3.libraryVisible;
-        if (MaschineMK3.libraryVisible) { MaschineMK3.mixerVisible = false; }
+        if (MaschineMK3.libraryVisible) {
+            MaschineMK3.mixerVisible = false;
+            MaschineMK3.padMode = "t9";
+        } else {
+            MaschineMK3.padMode = null;
+        }
+        MaschineMK3.updatePadModeLED();
+        MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
         break;
 
@@ -775,19 +782,7 @@ MaschineMK3.onButtonPress = function(name) {
     case "mixer":
         MaschineMK3.mixerVisible = !MaschineMK3.mixerVisible;
         if (MaschineMK3.mixerVisible) { MaschineMK3.libraryVisible = false; }
-        MaschineMK3.updatePanels();
-        break;
-
-    // --- T9 text input: toggle via keyboard button ---
-    case "keyboard":
-        if (MaschineMK3.padMode === "t9") {
-            MaschineMK3.padMode = null;
-        } else {
-            MaschineMK3.padMode = "t9";
-            MaschineMK3.libraryVisible = false;
-            MaschineMK3.mixerVisible = false;
-        }
-        MaschineMK3.setLed("keyboard", MaschineMK3.padMode === "t9" ? 63 : 0);
+        if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
