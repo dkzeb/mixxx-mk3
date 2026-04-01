@@ -65,6 +65,9 @@ SPEED_MAX = 30
 # Flag file for cursor visibility (screen daemon checks this)
 MOUSE_ACTIVE_FLAG = "/tmp/mk3-mouse-active"
 
+# Overlay active flag (written by overlay daemon)
+OVERLAY_ACTIVE_FLAG = "/tmp/mk3-overlay-active"
+
 
 # ---------------------------------------------------------------------------
 # ButtonLedWriter — writes Report 0x80 for button LEDs
@@ -192,6 +195,10 @@ def main():
                     continue
 
                 if not data:
+                    continue
+
+                # Skip input when overlay widget has focus
+                if os.path.exists(OVERLAY_ACTIVE_FLAG):
                     continue
 
                 report_id = data[0]

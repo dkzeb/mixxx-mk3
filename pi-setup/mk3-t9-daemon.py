@@ -52,6 +52,9 @@ MOUSE_AUTO_MASK = 0x20
 MOUSE_MACRO_BYTE = 0x07
 MOUSE_MACRO_MASK = 0x01
 
+# Overlay active flag (written by overlay daemon)
+OVERLAY_ACTIVE_FLAG = "/tmp/mk3-overlay-active"
+
 # Pad HID report
 PAD_REPORT_ID = 0x02
 PAD_PRESSURE_THRESHOLD = 256
@@ -290,6 +293,10 @@ def main():
                     continue
 
                 if not data:
+                    continue
+
+                # Skip input when overlay widget has focus
+                if os.path.exists(OVERLAY_ACTIVE_FLAG):
                     continue
 
                 report_id = data[0]
