@@ -36,7 +36,8 @@ sudo apt-get install -y \
     zenity \
     qrencode \
     feh \
-    wireplumber
+    wireplumber \
+    dmz-cursor-theme
 
 # ── 2. Build screen daemon ──────────────────────────────────────────
 echo "--- [2/9] Building screen daemon ---"
@@ -202,6 +203,11 @@ sed -e "s/User=pi/User=$PI_USER/" \
     -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
     "$SCRIPT_DIR/mk3-t9-daemon.service" | sudo tee /etc/systemd/system/mk3-t9-daemon.service > /dev/null
 
+# Mouse mode daemon — patched for this user
+sed -e "s/User=pi/User=$PI_USER/" \
+    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
+    "$SCRIPT_DIR/mk3-mouse-daemon.service" | sudo tee /etc/systemd/system/mk3-mouse-daemon.service > /dev/null
+
 sudo systemctl daemon-reload
 sudo systemctl enable xvfb.service
 sudo systemctl enable openbox.service
@@ -209,6 +215,7 @@ sudo systemctl enable mk3-screen-daemon.service
 sudo systemctl enable mixxx.service
 sudo systemctl enable mk3-settings-watcher.service
 sudo systemctl enable mk3-t9-daemon.service
+sudo systemctl enable mk3-mouse-daemon.service
 
 # Add user to required groups
 sudo usermod -aG audio "$PI_USER"
