@@ -1,0 +1,17 @@
+[Unit]
+Description=MK3 Overlay Widget System
+After=openbox.service
+Requires=openbox.service
+
+[Service]
+Type=simple
+User=pi
+Environment=DISPLAY=:99
+Environment=HOME=/home/pi
+ExecStart=/usr/bin/python3 -m mk3_overlay.daemon
+WorkingDirectory=/home/pi/mixx-mk3/pi-setup
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
