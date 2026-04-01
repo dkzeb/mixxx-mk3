@@ -37,7 +37,8 @@ sudo apt-get install -y \
     qrencode \
     feh \
     wireplumber \
-    dmz-cursor-theme
+    dmz-cursor-theme \
+    x11-xserver-utils
 
 # ── 2. Build screen daemon ──────────────────────────────────────────
 echo "--- [2/9] Building screen daemon ---"

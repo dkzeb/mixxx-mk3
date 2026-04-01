@@ -9,6 +9,7 @@ Environment=DISPLAY=:99
 Environment=XCURSOR_THEME=DMZ-White
 Environment=XCURSOR_SIZE=24
 ExecStart=/usr/bin/openbox
+ExecStartPost=/usr/bin/xsetroot -cursor_name left_ptr
 Restart=on-failure
 RestartSec=2
 
