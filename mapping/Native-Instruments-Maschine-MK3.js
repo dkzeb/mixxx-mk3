@@ -299,6 +299,7 @@ MaschineMK3.touchstripTouched = false;      // whether strip is being touched
 
 MaschineMK3.shiftPressed  = false;
 MaschineMK3.selectPressed = false;     // "select" button held = modifier for deck switching
+MaschineMK3.mouseMode     = false;     // mouse mode active (Auto+Macro combo)
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
 MaschineMK3.libraryVisible  = false;    // whether the library panel is shown
 MaschineMK3.mixerVisible    = false;    // whether the mixer panel is shown
@@ -812,6 +813,24 @@ MaschineMK3.updatePadLEDs = function() {
 MaschineMK3.onButtonPress = function(name) {
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
 
+    // --- Mouse mode toggle: Auto + Macro combo ---
+    if (name === "auto" || name === "macroSet") {
+        var autoHeld = name === "auto" || (MaschineMK3.lastButtonState["auto"] || false);
+        var macroHeld = name === "macroSet" || (MaschineMK3.lastButtonState["macroSet"] || false);
+        if (autoHeld && macroHeld) {
+            MaschineMK3.mouseMode = !MaschineMK3.mouseMode;
+            return;
+        }
+    }
+
+    // Ignore nav/stepper inputs when mouse mode is active
+    if (MaschineMK3.mouseMode) {
+        if (name === "navUp" || name === "navDown" || name === "navLeft" ||
+            name === "navRight" || name === "navPush") {
+            return;
+        }
+    }
+
     switch (name) {
     // --- Transport: follows active deck ---
     case "play":
@@ -1044,6 +1063,14 @@ MaschineMK3.onButtonPress = function(name) {
 // onButtonRelease — called for each detected button release edge.
 // ---------------------------------------------------------------------------
 MaschineMK3.onButtonRelease = function(name) {
+    // Ignore nav releases when mouse mode is active
+    if (MaschineMK3.mouseMode) {
+        if (name === "navUp" || name === "navDown" || name === "navLeft" ||
+            name === "navRight" || name === "navPush") {
+            return;
+        }
+    }
+
     switch (name) {
     case "shift":
         MaschineMK3.shiftPressed = false;
@@ -1206,6 +1233,7 @@ MaschineMK3.onKnobChange = function(name, value) {
 // direction: positive = clockwise, negative = counter-clockwise.
 // ---------------------------------------------------------------------------
 MaschineMK3.onStepperChange = function(direction) {
+    if (MaschineMK3.mouseMode) { return; }
     if (MaschineMK3.settingsVisible) {
         // Stepper scrolls settings cursor
         MaschineMK3.settingsConfirm = false;

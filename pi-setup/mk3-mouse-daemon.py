@@ -62,6 +62,9 @@ SPEED_DEFAULT = 8
 SPEED_MIN = 1
 SPEED_MAX = 30
 
+# Flag file for cursor visibility (screen daemon checks this)
+MOUSE_ACTIVE_FLAG = "/tmp/mk3-mouse-active"
+
 
 # ---------------------------------------------------------------------------
 # ButtonLedWriter — writes Report 0x80 for button LEDs
@@ -175,6 +178,10 @@ def main():
             nav_push_was = False
             leds.set_mouse_leds(False)
             leds.send()
+            try:
+                os.remove(MOUSE_ACTIVE_FLAG)
+            except OSError:
+                pass
 
         try:
             while True:
@@ -208,6 +215,7 @@ def main():
                         mouse_active = True
                         leds.set_mouse_leds(True)
                         leds.send()
+                        open(MOUSE_ACTIVE_FLAG, "w").close()
                         print(f"{LOG_PREFIX}: mouse mode ON", file=sys.stderr)
 
                 auto_was_pressed = auto_pressed
@@ -270,6 +278,10 @@ def main():
             try:
                 leds.set_mouse_leds(False)
                 leds.send()
+            except OSError:
+                pass
+            try:
+                os.remove(MOUSE_ACTIVE_FLAG)
             except OSError:
                 pass
             os.close(fd)

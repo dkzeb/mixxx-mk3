@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -86,6 +87,10 @@ const uint8_t* capture_frame(capture_ctx_t* ctx) {
     ctx->stride = ctx->image->bytes_per_line;
 
     if (!ctx->has_xfixes || !ctx->composite_buf)
+        return (const uint8_t*)ctx->image->data;
+
+    /* Only composite cursor when mouse mode is active */
+    if (access("/tmp/mk3-mouse-active", F_OK) != 0)
         return (const uint8_t*)ctx->image->data;
 
     /* Copy frame into composite buffer, then overlay cursor */
