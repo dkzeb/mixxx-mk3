@@ -16,7 +16,7 @@ echo "Home:        $PI_HOME"
 echo ""
 
 # ── 1. Install system dependencies ──────────────────────────────────
-echo "--- [1/8] Installing dependencies ---"
+echo "--- [1/9] Installing dependencies ---"
 sudo apt-get update -qq
 sudo apt-get install -y \
     mixxx \
@@ -34,10 +34,14 @@ sudo apt-get install -y \
     pipewire-alsa \
     pipewire-jack \
     zenity \
-    wireplumber
+    qrencode \
+    feh \
+    wireplumber \
+    dmz-cursor-theme \
+    x11-xserver-utils
 
 # ── 2. Build screen daemon ──────────────────────────────────────────
-echo "--- [2/8] Building screen daemon ---"
+echo "--- [2/9] Building screen daemon ---"
 cd "$PROJECT_DIR"
 rm -rf build && mkdir build && cd build
 cmake .. -DCAPTURE_BACKEND=x11
@@ -46,7 +50,7 @@ sudo install -m 755 screen-daemon/mk3-screen-daemon /usr/local/bin/mk3-screen-da
 echo "Installed: /usr/local/bin/mk3-screen-daemon"
 
 # ── 3. Install HID mapping ──────────────────────────────────────────
-echo "--- [3/8] Installing MK3 controller mapping ---"
+echo "--- [3/9] Installing MK3 controller mapping ---"
 MIXXX_DIR="$PI_HOME/.mixxx/controllers"
 mkdir -p "$MIXXX_DIR"
 cp "$PROJECT_DIR/mapping/Native-Instruments-Maschine-MK3.hid.xml" "$MIXXX_DIR/"
@@ -64,7 +68,7 @@ sudo cp "$PROJECT_DIR/skin/MK3/"*.png "$SKIN_DIR/" 2>/dev/null || true
 echo "Skin installed to: $SKIN_DIR/"
 
 # ── 4. Configure Mixxx ──────────────────────────────────────────────
-echo "--- [4/8] Configuring Mixxx ---"
+echo "--- [4/9] Configuring Mixxx ---"
 mkdir -p "$PI_HOME/Music"
 
 # Pre-configure library directory in Mixxx's SQLite DB to skip first-run dialog
@@ -138,7 +142,7 @@ chown "$PI_USER:$PI_USER" "$PI_HOME/.mixxx/soundconfig.xml"
 echo "Mixxx audio: MK3 via PipeWire/JACK (master ch 0-1, headphones ch 2-3)"
 
 # ── 5. Configure openbox for fullscreen (no decorations) ────────────
-echo "--- [5/8] Configuring openbox (fullscreen, no decorations) ---"
+echo "--- [5/9] Configuring openbox (fullscreen, no decorations) ---"
 OB_DIR="$PI_HOME/.config/openbox"
 mkdir -p "$OB_DIR"
 cat > "$OB_DIR/rc.xml" << 'OBEOF'
@@ -157,14 +161,14 @@ chown -R "$PI_USER:$PI_USER" "$PI_HOME/.config"
 echo "Openbox: no decorations, auto-fullscreen"
 
 # ── 6. Install udev rules ───────────────────────────────────────────
-echo "--- [6/8] Installing udev rules ---"
+echo "--- [6/9] Installing udev rules ---"
 sudo cp "$SCRIPT_DIR/99-mk3.rules" /etc/udev/rules.d/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 echo "udev rules installed."
 
 # ── 7. Install systemd services ─────────────────────────────────────
-echo "--- [7/8] Installing systemd services ---"
+echo "--- [7/9] Installing systemd services ---"
 
 sudo cp "$SCRIPT_DIR/xvfb.service" /etc/systemd/system/
 sudo cp "$SCRIPT_DIR/openbox.service" /etc/systemd/system/
@@ -200,6 +204,11 @@ sed -e "s/User=pi/User=$PI_USER/" \
     -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
     "$SCRIPT_DIR/mk3-t9-daemon.service" | sudo tee /etc/systemd/system/mk3-t9-daemon.service > /dev/null
 
+# Mouse mode daemon — patched for this user
+sed -e "s/User=pi/User=$PI_USER/" \
+    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
+    "$SCRIPT_DIR/mk3-mouse-daemon.service" | sudo tee /etc/systemd/system/mk3-mouse-daemon.service > /dev/null
+
 sudo systemctl daemon-reload
 sudo systemctl enable xvfb.service
 sudo systemctl enable openbox.service
@@ -207,14 +216,37 @@ sudo systemctl enable mk3-screen-daemon.service
 sudo systemctl enable mixxx.service
 sudo systemctl enable mk3-settings-watcher.service
 sudo systemctl enable mk3-t9-daemon.service
+sudo systemctl enable mk3-mouse-daemon.service
 
 # Add user to required groups
 sudo usermod -aG audio "$PI_USER"
 sudo usermod -aG video "$PI_USER"
 echo "Services enabled: xvfb, openbox, pipewire, wireplumber, mk3-screen-daemon, mixxx"
 
-# ── 8. Verify ───────────────────────────────────────────────────────
-echo "--- [8/8] Verifying ---"
+# ── 8. Tailscale VPN (optional) ────────────────────────────────────
+echo "--- [8/9] Tailscale VPN ---"
+if ! command -v tailscale &>/dev/null; then
+    echo "Installing Tailscale..."
+    curl -fsSL https://tailscale.com/install.sh | sh
+fi
+
+echo ""
+read -p "Set up Tailscale VPN now? (y/n): " TAILSCALE_SETUP
+if [ "$TAILSCALE_SETUP" = "y" ] || [ "$TAILSCALE_SETUP" = "Y" ]; then
+    echo "Starting Tailscale..."
+    echo "A login URL will appear below. Visit it in your browser to authenticate."
+    echo ""
+    sudo tailscale up
+    echo ""
+    echo "Tailscale status:"
+    tailscale status
+else
+    echo "Tailscale installed but not configured."
+    echo "You can set it up later via Settings > Network > Setup VPN on the MK3."
+fi
+
+# ── 9. Verify ───────────────────────────────────────────────────────
+echo "--- [9/9] Verifying ---"
 echo "  Xvfb:    $(which Xvfb)"
 echo "  openbox: $(which openbox)"
 echo "  Mixxx:   $(mixxx --version 2>&1 | head -1)"

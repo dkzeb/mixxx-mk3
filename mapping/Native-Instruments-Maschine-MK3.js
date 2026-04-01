@@ -299,9 +299,71 @@ MaschineMK3.touchstripTouched = false;      // whether strip is being touched
 
 MaschineMK3.shiftPressed  = false;
 MaschineMK3.selectPressed = false;     // "select" button held = modifier for deck switching
+MaschineMK3.mouseMode     = false;     // mouse mode active (Auto+Macro combo)
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
-MaschineMK3.libraryVisible = false;    // whether the library panel is shown
-MaschineMK3.mixerVisible   = false;    // whether the mixer panel is shown
+MaschineMK3.libraryVisible  = false;    // whether the library panel is shown
+MaschineMK3.mixerVisible    = false;    // whether the mixer panel is shown
+MaschineMK3.settingsVisible = false;    // whether the settings panel is shown
+MaschineMK3.settingsTab     = 0;        // 0=General, 1=Library, 2=Network
+MaschineMK3.settingsCursor  = 0;        // index into current tab's selectable items
+MaschineMK3.settingsConfirm = false;    // true when awaiting destructive confirmation
+MaschineMK3.settingsConfirmTimer = 0;   // timer ID for auto-cancel
+
+// Settings tab definitions: each item has type, label, and action key.
+// type: "action" (chevron, NavPush executes), "toggle" (switch), "info" (read-only, cursor skips)
+// confirm: true for destructive actions requiring two-step confirmation
+MaschineMK3.settingsTabs = [
+    { name: "GENERAL", items: [
+        { type: "action",  label: "Reboot",              action: "reboot",    confirm: true },
+        { type: "action",  label: "Shutdown",            action: "shutdown",  confirm: true },
+        { type: "action",  label: "Check for Updates",   action: "update" },
+        { type: "toggle",  label: "Auto-update on boot", action: "autoupdate", stateKey: "settingsAutoUpdate" },
+        { type: "info",    label: "Version" },
+    ]},
+    { name: "LIBRARY", items: [
+        { type: "action",  label: "Rescan Library",      action: "rescan" },
+        { type: "action",  label: "Mount USB Drive",     action: "mount-usb" },
+        { type: "action",  label: "Unmount USB Drive",   action: "unmount-usb" },
+        { type: "info",    label: "Library Location" },
+    ]},
+    { name: "NETWORK", items: [
+        { type: "info",    label: "IP Address" },
+        { type: "info",    label: "Hostname" },
+        { type: "info",    label: "WiFi Network" },
+        { type: "action",  label: "WiFi Select",         action: "wifi-select" },
+        { type: "toggle",  label: "Tailscale",           action: "tailscale", stateKey: "settingsTailscale" },
+        { type: "toggle",  label: "Hotspot",             action: "hotspot",   stateKey: "settingsHotspot" },
+    ]},
+];
+
+// Toggle states (persisted via command daemon)
+MaschineMK3.settingsAutoUpdate = false;
+MaschineMK3.settingsTailscale  = false;
+MaschineMK3.settingsHotspot    = false;
+
+// Returns the index of the next selectable item in the given direction.
+// Wraps around. Returns current if no selectable items exist.
+MaschineMK3.settingsNextSelectable = function(tab, current, direction) {
+    var items = MaschineMK3.settingsTabs[tab].items;
+    var len = items.length;
+    if (len === 0) { return 0; }
+    var idx = current;
+    for (var i = 0; i < len; i++) {
+        idx = (idx + direction + len) % len;
+        if (items[idx].type !== "info") { return idx; }
+    }
+    return current;
+};
+
+// Returns the index of the first selectable item in a tab.
+MaschineMK3.settingsFirstSelectable = function(tab) {
+    var items = MaschineMK3.settingsTabs[tab].items;
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].type !== "info") { return i; }
+    }
+    return 0;
+};
+
 MaschineMK3.padMode       = null;      // null | "loops" | "effects" | "cuepoints" | "t9" — null = pads inactive
 
 // Effects pad mapping: pad number → {unit, slot} or {unit, "enable"}
@@ -407,14 +469,16 @@ MaschineMK3.updateLibrary = function() {
 MaschineMK3.updatePanels = function() {
     var showLib = MaschineMK3.libraryVisible;
     var showMix = MaschineMK3.mixerVisible;
-    var noPanelOpen = !showLib && !showMix;
+    var showSet = MaschineMK3.settingsVisible;
+    var noPanelOpen = !showLib && !showMix && !showSet;
     var showPadsLoops = noPanelOpen && MaschineMK3.padMode === "loops";
     var showPadsFx = noPanelOpen && MaschineMK3.padMode === "effects";
     var showPadsCues = noPanelOpen && MaschineMK3.padMode === "cuepoints";
-    var anyPanel = showLib || showMix || showPadsLoops || showPadsFx || showPadsCues;
+    var anyPanel = showLib || showMix || showSet || showPadsLoops || showPadsFx || showPadsCues;
 
     engine.setValue("[Skin]", "show_library", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_mixer", showMix ? 1 : 0);
+    engine.setValue("[Skin]", "show_settings", showSet ? 1 : 0);
     engine.setValue("[Skin]", "show_t9", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_loops", showPadsLoops ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_fx", showPadsFx ? 1 : 0);
@@ -432,11 +496,110 @@ MaschineMK3.updatePanels = function() {
 
     MaschineMK3.setLed("browserPlugin", showLib ? 63 : 16);
     MaschineMK3.setLed("mixer", showMix ? 63 : 16);
+    MaschineMK3.setLed("settings", showSet ? 63 : 16);
 
     if (showLib) {
         // focused_widget: 0=none, 1=search bar, 2=sidebar, 3=track table
         engine.setValue("[Library]", "focused_widget", 1);
     }
+};
+
+// ---------------------------------------------------------------------------
+// updateSettingsSkinCOs — push settings state to skin COs for display.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateSettingsSkinCOs = function() {
+    // Tab visibility
+    for (var t = 0; t < 3; t++) {
+        engine.setValue("[Skin]", "settings_tab_" + t, MaschineMK3.settingsTab === t ? 1 : 0);
+    }
+    // Cursor position (max 6 items per tab)
+    for (var c = 0; c < 6; c++) {
+        engine.setValue("[Skin]", "settings_cursor_" + c, MaschineMK3.settingsCursor === c ? 1 : 0);
+    }
+    // Confirmation mode
+    engine.setValue("[Skin]", "settings_confirming", MaschineMK3.settingsConfirm ? 1 : 0);
+    // Toggle states
+    engine.setValue("[Skin]", "settings_autoupdate", MaschineMK3.settingsAutoUpdate ? 1 : 0);
+    engine.setValue("[Skin]", "settings_tailscale", MaschineMK3.settingsTailscale ? 1 : 0);
+    engine.setValue("[Skin]", "settings_hotspot", MaschineMK3.settingsHotspot ? 1 : 0);
+};
+
+// ---------------------------------------------------------------------------
+// updateSettingsLEDs — set D-button LEDs for settings tabs.
+// Active tab = bright, other tabs = dim, unused D4/D8 = off.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateSettingsLEDs = function() {
+    var offset = (MaschineMK3.activeDeck === 1) ? 5 : 1; // D5-D8 or D1-D4
+    for (var i = 0; i < 4; i++) {
+        var dName = "d" + (offset + i);
+        if (i < 3) {
+            MaschineMK3.setLed(dName, MaschineMK3.settingsTab === i ? 63 : 16);
+        } else {
+            MaschineMK3.setLed(dName, 0);
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
+// settingsExecuteItem — execute the currently highlighted settings item.
+// Handles confirmation for destructive actions, toggles, and command dispatch.
+// ---------------------------------------------------------------------------
+MaschineMK3.settingsExecuteItem = function() {
+    var tab = MaschineMK3.settingsTabs[MaschineMK3.settingsTab];
+    var item = tab.items[MaschineMK3.settingsCursor];
+    if (!item || item.type === "info") { return; }
+
+    if (item.type === "toggle") {
+        // Toggle the state and update skin
+        MaschineMK3[item.stateKey] = !MaschineMK3[item.stateKey];
+        MaschineMK3.updateSettingsSkinCOs();
+        // Dispatch command to daemon
+        var cmd = item.action + (MaschineMK3[item.stateKey] ? "-on" : "-off");
+        MaschineMK3.settingsDispatchCommand(cmd);
+        return;
+    }
+
+    // Action type
+    if (item.confirm && !MaschineMK3.settingsConfirm) {
+        // Enter confirmation mode
+        MaschineMK3.settingsConfirm = true;
+        MaschineMK3.updateSettingsSkinCOs();
+        // Auto-cancel after 5 seconds
+        MaschineMK3.settingsConfirmTimer = engine.beginTimer(5000, function() {
+            MaschineMK3.settingsConfirm = false;
+            MaschineMK3.settingsConfirmTimer = 0;
+            MaschineMK3.updateSettingsSkinCOs();
+        }, true);
+        return;
+    }
+
+    // Execute (either confirmed destructive or non-destructive action)
+    if (MaschineMK3.settingsConfirmTimer) {
+        engine.stopTimer(MaschineMK3.settingsConfirmTimer);
+        MaschineMK3.settingsConfirmTimer = 0;
+    }
+    MaschineMK3.settingsConfirm = false;
+    MaschineMK3.updateSettingsSkinCOs();
+
+    // Special case: rescan uses Mixxx built-in CO
+    if (item.action === "rescan") {
+        engine.setValue("[Library]", "rescan", 1);
+        return;
+    }
+
+    MaschineMK3.settingsDispatchCommand(item.action);
+};
+
+// ---------------------------------------------------------------------------
+// settingsDispatchCommand — write a command for the background daemon.
+// ---------------------------------------------------------------------------
+MaschineMK3.settingsDispatchCommand = function(cmd) {
+    // TODO: Wire bridge to mk3-settings-watcher.py daemon.
+    // The daemon watches /tmp/mk3-settings-cmd but Mixxx JS cannot write
+    // files. Plan: extend T9 daemon to poll [Skin],settings_command CO
+    // and write the cmd file. For now, log + manual test:
+    //   echo "reboot" > /tmp/mk3-settings-cmd
+    print("MK3 Settings command: " + cmd);
 };
 
 // ---------------------------------------------------------------------------
@@ -650,6 +813,24 @@ MaschineMK3.updatePadLEDs = function() {
 MaschineMK3.onButtonPress = function(name) {
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
 
+    // --- Mouse mode toggle: Auto + Macro combo ---
+    if (name === "auto" || name === "macroSet") {
+        var autoHeld = name === "auto" || (MaschineMK3.lastButtonState["auto"] || false);
+        var macroHeld = name === "macroSet" || (MaschineMK3.lastButtonState["macroSet"] || false);
+        if (autoHeld && macroHeld) {
+            MaschineMK3.mouseMode = !MaschineMK3.mouseMode;
+            return;
+        }
+    }
+
+    // Ignore nav/stepper inputs when mouse mode is active
+    if (MaschineMK3.mouseMode) {
+        if (name === "navUp" || name === "navDown" || name === "navLeft" ||
+            name === "navRight" || name === "navPush") {
+            return;
+        }
+    }
+
     switch (name) {
     // --- Transport: follows active deck ---
     case "play":
@@ -704,6 +885,7 @@ MaschineMK3.onButtonPress = function(name) {
         if (MaschineMK3.padMode === "cuepoints") {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsVisible = false;
         }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
@@ -719,46 +901,54 @@ MaschineMK3.onButtonPress = function(name) {
             // Normal press: toggle loops mode on/off
             MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? null : "loops";
         }
-        // Close library/mixer if opening a pad mode
+        // Close library/mixer/settings if opening a pad mode
         if (MaschineMK3.padMode !== null) {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsVisible = false;
         }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
         break;
 
-    // --- D buttons: per-deck controls (D1-D4 = Deck A, D5-D8 = Deck B) ---
-    // D1/D5: Sync
-    case "d1":
-        engine.setValue("[Channel1]", "sync_enabled",
-            engine.getValue("[Channel1]", "sync_enabled") ? 0 : 1);
-        break;
-    case "d5":
-        engine.setValue("[Channel2]", "sync_enabled",
-            engine.getValue("[Channel2]", "sync_enabled") ? 0 : 1);
-        break;
-    // D2/D6: Tempo nudge down (momentary)
-    case "d2":
-        engine.setValue("[Channel1]", "rate_temp_down", 1);
-        break;
-    case "d6":
-        engine.setValue("[Channel2]", "rate_temp_down", 1);
-        break;
-    // D3/D7: Tempo nudge up (momentary)
-    case "d3":
-        engine.setValue("[Channel1]", "rate_temp_up", 1);
-        break;
-    case "d7":
-        engine.setValue("[Channel2]", "rate_temp_up", 1);
-        break;
-    // D4/D8: headphone cue (PFL) toggle
-    case "d4":
-        engine.setValue("[Channel1]", "pfl", engine.getValue("[Channel1]", "pfl") ? 0 : 1);
-        break;
-    case "d8":
-        engine.setValue("[Channel2]", "pfl", engine.getValue("[Channel2]", "pfl") ? 0 : 1);
+    // --- D buttons: settings tabs when settings open, else per-deck controls ---
+    case "d1": case "d2": case "d3": case "d4":
+    case "d5": case "d6": case "d7": case "d8":
+        var dNum = parseInt(name.charAt(1), 10);  // 1-8
+        if (MaschineMK3.settingsVisible) {
+            // D buttons on the settings screen side act as tab selectors
+            var settingsOffset = (MaschineMK3.activeDeck === 1) ? 5 : 1;
+            var tabIdx = dNum - settingsOffset;
+            if (tabIdx >= 0 && tabIdx < 3) {
+                MaschineMK3.settingsTab = tabIdx;
+                MaschineMK3.settingsCursor = MaschineMK3.settingsFirstSelectable(tabIdx);
+                MaschineMK3.settingsConfirm = false;
+                MaschineMK3.updateSettingsLEDs();
+                MaschineMK3.updateSettingsSkinCOs();
+            }
+            break;
+        }
+        // Normal DJ mode D-button behavior
+        if (dNum === 1) {
+            engine.setValue("[Channel1]", "sync_enabled",
+                engine.getValue("[Channel1]", "sync_enabled") ? 0 : 1);
+        } else if (dNum === 5) {
+            engine.setValue("[Channel2]", "sync_enabled",
+                engine.getValue("[Channel2]", "sync_enabled") ? 0 : 1);
+        } else if (dNum === 2) {
+            engine.setValue("[Channel1]", "rate_temp_down", 1);
+        } else if (dNum === 6) {
+            engine.setValue("[Channel2]", "rate_temp_down", 1);
+        } else if (dNum === 3) {
+            engine.setValue("[Channel1]", "rate_temp_up", 1);
+        } else if (dNum === 7) {
+            engine.setValue("[Channel2]", "rate_temp_up", 1);
+        } else if (dNum === 4) {
+            engine.setValue("[Channel1]", "pfl", engine.getValue("[Channel1]", "pfl") ? 0 : 1);
+        } else if (dNum === 8) {
+            engine.setValue("[Channel2]", "pfl", engine.getValue("[Channel2]", "pfl") ? 0 : 1);
+        }
         break;
 
     // --- Deck select: arrow left/right ---
@@ -776,6 +966,7 @@ MaschineMK3.onButtonPress = function(name) {
         MaschineMK3.libraryVisible = !MaschineMK3.libraryVisible;
         if (MaschineMK3.libraryVisible) {
             MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsVisible = false;
             MaschineMK3.padMode = "t9";
         } else {
             MaschineMK3.padMode = null;
@@ -788,35 +979,74 @@ MaschineMK3.onButtonPress = function(name) {
     // --- Mixer: toggle mixer panel ---
     case "mixer":
         MaschineMK3.mixerVisible = !MaschineMK3.mixerVisible;
-        if (MaschineMK3.mixerVisible) { MaschineMK3.libraryVisible = false; }
+        if (MaschineMK3.mixerVisible) {
+            MaschineMK3.libraryVisible = false;
+            MaschineMK3.settingsVisible = false;
+        }
         if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
         break;
 
-    // --- Library navigation (4D encoder) ---
+    // --- Settings: toggle settings panel ---
+    case "settings":
+        MaschineMK3.settingsVisible = !MaschineMK3.settingsVisible;
+        if (MaschineMK3.settingsVisible) {
+            MaschineMK3.libraryVisible = false;
+            MaschineMK3.mixerVisible = false;
+            MaschineMK3.settingsTab = 0;
+            MaschineMK3.settingsCursor = MaschineMK3.settingsFirstSelectable(0);
+            MaschineMK3.settingsConfirm = false;
+            MaschineMK3.updateSettingsLEDs();
+        }
+        if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
+        MaschineMK3.updatePadModeLED();
+        MaschineMK3.updatePadLEDs();
+        MaschineMK3.updatePanels();
+        MaschineMK3.updateSettingsSkinCOs();
+        break;
+
+    // --- Navigation (4D encoder) ---
     case "navUp":
-        engine.setValue("[Library]", "MoveUp", 1);
+        if (MaschineMK3.settingsVisible) {
+            MaschineMK3.settingsConfirm = false;
+            MaschineMK3.settingsCursor = MaschineMK3.settingsNextSelectable(
+                MaschineMK3.settingsTab, MaschineMK3.settingsCursor, -1);
+            MaschineMK3.updateSettingsSkinCOs();
+        } else {
+            engine.setValue("[Library]", "MoveUp", 1);
+        }
         break;
     case "navDown":
-        engine.setValue("[Library]", "MoveDown", 1);
+        if (MaschineMK3.settingsVisible) {
+            MaschineMK3.settingsConfirm = false;
+            MaschineMK3.settingsCursor = MaschineMK3.settingsNextSelectable(
+                MaschineMK3.settingsTab, MaschineMK3.settingsCursor, 1);
+            MaschineMK3.updateSettingsSkinCOs();
+        } else {
+            engine.setValue("[Library]", "MoveDown", 1);
+        }
         break;
     case "navLeft":
-        engine.setValue("[Library]", "MoveFocusBackward", 1);
+        if (!MaschineMK3.settingsVisible) {
+            engine.setValue("[Library]", "MoveFocusBackward", 1);
+        }
         break;
     case "navRight":
-        engine.setValue("[Library]", "MoveFocusForward", 1);
+        if (!MaschineMK3.settingsVisible) {
+            engine.setValue("[Library]", "MoveFocusForward", 1);
+        }
         break;
     case "navPush":
-        if (MaschineMK3.libraryVisible) {
+        if (MaschineMK3.settingsVisible) {
+            MaschineMK3.settingsExecuteItem();
+        } else if (MaschineMK3.libraryVisible) {
             // Cycle focus: search bar (1) → track table (3) → load track
             var focus = engine.getValue("[Library]", "focused_widget");
             if (focus === 1) {
-                // Search bar focused → move to track table
                 engine.setValue("[Library]", "focused_widget", 3);
             } else {
-                // Track table focused → load selected track and close library
                 engine.setValue("[Channel" + MaschineMK3.activeDeck + "]", "LoadSelectedTrack", 1);
                 MaschineMK3.libraryVisible = false;
                 MaschineMK3.padMode = null;
@@ -833,6 +1063,14 @@ MaschineMK3.onButtonPress = function(name) {
 // onButtonRelease — called for each detected button release edge.
 // ---------------------------------------------------------------------------
 MaschineMK3.onButtonRelease = function(name) {
+    // Ignore nav releases when mouse mode is active
+    if (MaschineMK3.mouseMode) {
+        if (name === "navUp" || name === "navDown" || name === "navLeft" ||
+            name === "navRight" || name === "navPush") {
+            return;
+        }
+    }
+
     switch (name) {
     case "shift":
         MaschineMK3.shiftPressed = false;
@@ -853,18 +1091,18 @@ MaschineMK3.onButtonRelease = function(name) {
     case "recCountIn":
         engine.setValue("[Channel" + MaschineMK3.activeDeck + "]", "cue_default", 0);
         break;
-    // D button releases — tempo nudge (momentary)
+    // D button releases — tempo nudge (momentary), skip if settings open
     case "d2":
-        engine.setValue("[Channel1]", "rate_temp_down", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel1]", "rate_temp_down", 0); }
         break;
     case "d3":
-        engine.setValue("[Channel1]", "rate_temp_up", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel1]", "rate_temp_up", 0); }
         break;
     case "d6":
-        engine.setValue("[Channel2]", "rate_temp_down", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel2]", "rate_temp_down", 0); }
         break;
     case "d7":
-        engine.setValue("[Channel2]", "rate_temp_up", 0);
+        if (!MaschineMK3.settingsVisible) { engine.setValue("[Channel2]", "rate_temp_up", 0); }
         break;
     // Library nav pulses
     case "navUp":
@@ -995,6 +1233,15 @@ MaschineMK3.onKnobChange = function(name, value) {
 // direction: positive = clockwise, negative = counter-clockwise.
 // ---------------------------------------------------------------------------
 MaschineMK3.onStepperChange = function(direction) {
+    if (MaschineMK3.mouseMode) { return; }
+    if (MaschineMK3.settingsVisible) {
+        // Stepper scrolls settings cursor
+        MaschineMK3.settingsConfirm = false;
+        MaschineMK3.settingsCursor = MaschineMK3.settingsNextSelectable(
+            MaschineMK3.settingsTab, MaschineMK3.settingsCursor, direction > 0 ? 1 : -1);
+        MaschineMK3.updateSettingsSkinCOs();
+        return;
+    }
     if (direction > 0) {
         engine.setValue("[Library]", "MoveDown", 1);
         engine.setValue("[Library]", "MoveDown", 0);

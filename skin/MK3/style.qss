@@ -275,3 +275,100 @@
     border: none;
     border-bottom: 1px solid #333333;
 }
+
+/* ── Settings Panel ─────────────────────────────────────── */
+
+#SettingsPanel {
+    background-color: #0d0d1a;
+}
+
+#SettingsTabBar {
+    background-color: #111122;
+}
+
+#SettingsTabActive {
+    font-size: 11px;
+    font-weight: bold;
+    color: #e67e22;
+    qproperty-alignment: AlignCenter;
+    background-color: #1a1a2e;
+    border-bottom: 2px solid #e67e22;
+    padding: 4px;
+}
+
+#SettingsTabInactive {
+    font-size: 11px;
+    color: #555555;
+    qproperty-alignment: AlignCenter;
+    background-color: #111122;
+    border-bottom: 2px solid #111122;
+    padding: 4px;
+}
+
+#SettingsItem {
+    font-size: 12px;
+    color: #aaaaaa;
+    qproperty-alignment: AlignLeft;
+    padding: 2px 12px;
+    background-color: #0d0d1a;
+}
+
+#SettingsItemHighlight {
+    font-size: 12px;
+    color: #ffffff;
+    qproperty-alignment: AlignLeft;
+    padding: 2px 12px;
+    background-color: #1a1a2e;
+    border-left: 3px solid #e67e22;
+}
+
+#SettingsItemInfo {
+    font-size: 12px;
+    color: #555555;
+    qproperty-alignment: AlignLeft;
+    padding: 2px 12px;
+    background-color: #0d0d1a;
+}
+
+#SettingsChevron {
+    font-size: 14px;
+    color: #555555;
+    qproperty-alignment: AlignRight;
+    padding: 2px 12px;
+}
+
+#SettingsChevronHighlight {
+    font-size: 14px;
+    color: #e67e22;
+    qproperty-alignment: AlignRight;
+    padding: 2px 12px;
+}
+
+#SettingsToggleOn {
+    font-size: 10px;
+    font-weight: bold;
+    color: #ffffff;
+    qproperty-alignment: AlignCenter;
+    background-color: #e67e22;
+    border-radius: 7px;
+    padding: 1px 6px;
+}
+
+#SettingsToggleOff {
+    font-size: 10px;
+    color: #888888;
+    qproperty-alignment: AlignCenter;
+    background-color: #333333;
+    border-radius: 7px;
+    padding: 1px 6px;
+}
+
+#SettingsConfirm {
+    font-size: 12px;
+    font-weight: bold;
+    color: #e74c3c;
+    qproperty-alignment: AlignLeft;
+    padding: 2px 12px;
+    background-color: #2a1a1a;
+    border-left: 3px solid #e74c3c;
+}

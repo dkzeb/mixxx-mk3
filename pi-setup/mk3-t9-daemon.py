@@ -42,6 +42,16 @@ LOG_PREFIX = "mk3-t9-daemon"
 TOGGLE_BYTE = 0x08
 TOGGLE_MASK = 0x04
 
+# settings button: Report 0x01, byte 0x07, mask 0x02
+SETTINGS_BYTE = 0x07
+SETTINGS_MASK = 0x02
+
+# Mouse mode toggle: Auto (0x08, 0x20) + Macro (0x07, 0x01)
+MOUSE_AUTO_BYTE = 0x08
+MOUSE_AUTO_MASK = 0x20
+MOUSE_MACRO_BYTE = 0x07
+MOUSE_MACRO_MASK = 0x01
+
 # Pad HID report
 PAD_REPORT_ID = 0x02
 PAD_PRESSURE_THRESHOLD = 256
@@ -233,6 +243,9 @@ def main():
         leds = LedWriter(fd)
         t9_active = False
         toggle_was_pressed = False
+        settings_was_pressed = False
+        mouse_auto_was = False
+        mouse_macro_was = False
         pad_was_pressed = {}  # physical pad -> bool
 
         engine = None
@@ -303,6 +316,26 @@ def main():
                             pad_was_pressed.clear()
 
                     toggle_was_pressed = pressed
+
+                    # --- Settings button: deactivate T9 if active ---
+                    settings_pressed = (data[SETTINGS_BYTE] & SETTINGS_MASK) != 0
+                    if settings_pressed and not settings_was_pressed and t9_active:
+                        print(f"{LOG_PREFIX}: settings pressed, deactivating T9", file=sys.stderr)
+                        deactivate_t9()
+                    settings_was_pressed = settings_pressed
+
+                    # --- Mouse mode combo: deactivate T9 ---
+                    m_auto = (data[MOUSE_AUTO_BYTE] & MOUSE_AUTO_MASK) != 0
+                    m_macro = (data[MOUSE_MACRO_BYTE] & MOUSE_MACRO_MASK) != 0
+                    m_auto_edge = m_auto and not mouse_auto_was
+                    m_macro_edge = m_macro and not mouse_macro_was
+
+                    if ((m_auto_edge and m_macro) or (m_macro_edge and m_auto)) and t9_active:
+                        print(f"{LOG_PREFIX}: mouse combo pressed, deactivating T9", file=sys.stderr)
+                        deactivate_t9()
+
+                    mouse_auto_was = m_auto
+                    mouse_macro_was = m_macro
 
                 # --- Report 0x02: pad presses ---
                 if report_id == PAD_REPORT_ID and t9_active and engine:
