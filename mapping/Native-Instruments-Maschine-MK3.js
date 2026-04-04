@@ -300,6 +300,8 @@ MaschineMK3.touchstripTouched = false;      // whether strip is being touched
 MaschineMK3.shiftPressed  = false;
 MaschineMK3.selectPressed = false;     // "select" button held = modifier for deck switching
 MaschineMK3.mouseMode     = false;     // mouse mode active (Auto+Macro combo)
+MaschineMK3.autoPressed   = false;     // "auto" button held — enables knob snap-back
+MaschineMK3.autoSnap      = {};        // knob name -> {group, key, value} saved on touch
 MaschineMK3.activeDeck    = 1;         // 1 or 2 — which deck the browser loads to
 MaschineMK3.libraryVisible  = false;    // whether the library panel is shown
 MaschineMK3.mixerVisible    = false;    // whether the mixer panel is shown
@@ -658,8 +660,26 @@ MaschineMK3.onButtonPress = function(name) {
         var macroHeld = name === "macroSet" || (MaschineMK3.lastButtonState["macroSet"] || false);
         if (autoHeld && macroHeld) {
             MaschineMK3.mouseMode = !MaschineMK3.mouseMode;
+            MaschineMK3.autoPressed = false;
+            MaschineMK3.setLed("auto", 0);
             return;
         }
+    }
+
+    // --- Auto button: enable knob snap-back mode ---
+    if (name === "auto") {
+        MaschineMK3.autoPressed = true;
+        MaschineMK3.setLed("auto", 63);
+        return;
+    }
+
+    // --- Knob touch: save value when Auto is held ---
+    var knobName = MaschineMK3.knobTouchToName[name];
+    if (knobName) {
+        if (MaschineMK3.autoPressed) {
+            MaschineMK3.autoSnapSave(knobName);
+        }
+        return;
     }
 
     // Ignore nav/stepper inputs when mouse mode is active
@@ -852,6 +872,21 @@ MaschineMK3.onButtonPress = function(name) {
 // onButtonRelease — called for each detected button release edge.
 // ---------------------------------------------------------------------------
 MaschineMK3.onButtonRelease = function(name) {
+    // --- Auto button release: restore all snapped values ---
+    if (name === "auto") {
+        MaschineMK3.autoPressed = false;
+        MaschineMK3.autoSnapRestoreAll();
+        MaschineMK3.setLed("auto", 0);
+        return;
+    }
+
+    // --- Knob touch release: restore snapped value for this knob ---
+    var knobName = MaschineMK3.knobTouchToName[name];
+    if (knobName) {
+        MaschineMK3.autoSnapRestore(knobName);
+        return;
+    }
+
     // Ignore nav releases when mouse mode is active
     if (MaschineMK3.mouseMode) {
         if (name === "navUp" || name === "navDown" || name === "navLeft" ||
@@ -910,6 +945,83 @@ MaschineMK3.onButtonRelease = function(name) {
         engine.setValue("[Library]", "GoToItem", 0);
         break;
     }
+};
+
+// ---------------------------------------------------------------------------
+// Knob → Mixxx control binding, based on current mode.
+// Returns {group, key} or null (e.g. jog has no persistent value).
+// ---------------------------------------------------------------------------
+MaschineMK3.getKnobBinding = function(knobName) {
+    if (MaschineMK3.mixerVisible) {
+        switch (knobName) {
+        case "k1": return {group: "[EqualizerRack1_[Channel1]_Effect1]", key: "parameter3"};
+        case "k2": return {group: "[EqualizerRack1_[Channel1]_Effect1]", key: "parameter2"};
+        case "k3": return {group: "[EqualizerRack1_[Channel1]_Effect1]", key: "parameter1"};
+        case "k4": return {group: "[Channel1]", key: "volume"};
+        case "k5": return {group: "[EqualizerRack1_[Channel2]_Effect1]", key: "parameter3"};
+        case "k6": return {group: "[EqualizerRack1_[Channel2]_Effect1]", key: "parameter2"};
+        case "k7": return {group: "[EqualizerRack1_[Channel2]_Effect1]", key: "parameter1"};
+        case "k8": return {group: "[Channel2]", key: "volume"};
+        }
+    } else {
+        switch (knobName) {
+        case "k1": return {group: "[Channel1]", key: "rate"};
+        case "k2": return MaschineMK3.shiftPressed
+                        ? {group: "[Channel1]", key: "waveform_zoom"}
+                        : null;  // jog — no persistent value
+        case "k3": return {group: "[Channel1]", key: "volume"};
+        case "k4": return {group: "[QuickEffectRack1_[Channel1]]", key: "super1"};
+        case "k5": return {group: "[Channel2]", key: "rate"};
+        case "k6": return MaschineMK3.shiftPressed
+                        ? {group: "[Channel2]", key: "waveform_zoom"}
+                        : null;
+        case "k7": return {group: "[Channel2]", key: "volume"};
+        case "k8": return {group: "[QuickEffectRack1_[Channel2]]", key: "super1"};
+        }
+    }
+    return null;
+};
+
+// ---------------------------------------------------------------------------
+// Auto-snap: save/restore knob values when Auto is held + knob touched.
+// ---------------------------------------------------------------------------
+MaschineMK3.knobTouchToName = {
+    "knobTouch1": "k1", "knobTouch2": "k2", "knobTouch3": "k3", "knobTouch4": "k4",
+    "knobTouch5": "k5", "knobTouch6": "k6", "knobTouch7": "k7", "knobTouch8": "k8"
+};
+
+MaschineMK3.autoSnapSave = function(knobName) {
+    var binding = MaschineMK3.getKnobBinding(knobName);
+    if (!binding) { return; }
+    MaschineMK3.autoSnap[knobName] = {
+        group: binding.group,
+        key:   binding.key,
+        value: engine.getValue(binding.group, binding.key)
+    };
+    // Tell the skin which knob slot has auto-touch active (1-based index)
+    var idx = parseInt(knobName.charAt(1), 10);
+    engine.setValue("[Skin]", "auto_touch_k" + idx, 1);
+};
+
+MaschineMK3.autoSnapRestore = function(knobName) {
+    var snap = MaschineMK3.autoSnap[knobName];
+    if (!snap) { return; }
+    engine.setValue(snap.group, snap.key, snap.value);
+    delete MaschineMK3.autoSnap[knobName];
+    var idx = parseInt(knobName.charAt(1), 10);
+    engine.setValue("[Skin]", "auto_touch_k" + idx, 0);
+};
+
+MaschineMK3.autoSnapRestoreAll = function() {
+    for (var knobName in MaschineMK3.autoSnap) {
+        if (MaschineMK3.autoSnap.hasOwnProperty(knobName)) {
+            var snap = MaschineMK3.autoSnap[knobName];
+            engine.setValue(snap.group, snap.key, snap.value);
+            var idx = parseInt(knobName.charAt(1), 10);
+            engine.setValue("[Skin]", "auto_touch_k" + idx, 0);
+        }
+    }
+    MaschineMK3.autoSnap = {};
 };
 
 // ---------------------------------------------------------------------------

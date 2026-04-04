@@ -241,6 +241,13 @@
     qproperty-alignment: AlignCenter;
 }
 
+#KnobLabelAuto {
+    font-size: 9px;
+    font-weight: bold;
+    color: #e74c3c;
+    qproperty-alignment: AlignCenter;
+}
+
 #WaveformOverviewA, #WaveformOverviewB {
     border-top: 1px solid #333333;
     border-bottom: 1px solid #333333;

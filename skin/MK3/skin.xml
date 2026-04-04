@@ -20,6 +20,14 @@
       <attribute config_key="[Skin],show_pads_fx">0</attribute>
       <attribute config_key="[Skin],show_pads_cues">0</attribute>
       <attribute config_key="[Skin],show_t9">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k1">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k2">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k3">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k4">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k5">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k6">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k7">0</attribute>
+      <attribute config_key="[Skin],auto_touch_k8">0</attribute>
     </attributes>
   </manifest>
 
@@ -221,24 +229,66 @@
           <Connection><ConfigKey>[Skin],shift_held</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
           <Children>
             <!-- Nested: show normal or mixer based on show_mixer -->
+            <!-- Normal mode (not mixer) -->
             <WidgetGroup>
               <SizePolicy>me,f</SizePolicy><Layout>horizontal</Layout>
               <Connection><ConfigKey>[Skin],show_mixer</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
               <Children>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>TEMPO</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>JOG</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>FILTER</Text></Label>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>TEMPO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k1</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; TEMPO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k1</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>JOG</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k2</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; JOG</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k2</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k3</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k3</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>FILTER</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k4</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; FILTER</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k4</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
               </Children>
             </WidgetGroup>
+            <!-- Mixer mode -->
             <WidgetGroup>
               <SizePolicy>me,f</SizePolicy><Layout>horizontal</Layout>
               <Connection><ConfigKey>[Skin],show_mixer</ConfigKey><BindProperty>visible</BindProperty></Connection>
               <Children>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>HI</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>MID</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>LO</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>HI</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k1</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; HI</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k1</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>MID</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k2</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; MID</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k2</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>LO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k3</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; LO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k3</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k4</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k4</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
               </Children>
             </WidgetGroup>
           </Children>
@@ -952,24 +1002,66 @@
           <Layout>horizontal</Layout>
           <Connection><ConfigKey>[Skin],shift_held</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
           <Children>
+            <!-- Normal mode (not mixer) -->
             <WidgetGroup>
               <SizePolicy>me,f</SizePolicy><Layout>horizontal</Layout>
               <Connection><ConfigKey>[Skin],show_mixer</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection>
               <Children>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>TEMPO</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>JOG</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>FILTER</Text></Label>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>TEMPO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k5</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; TEMPO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k5</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>JOG</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k6</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; JOG</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k6</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k7</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k7</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>FILTER</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k8</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; FILTER</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k8</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
               </Children>
             </WidgetGroup>
+            <!-- Mixer mode -->
             <WidgetGroup>
               <SizePolicy>me,f</SizePolicy><Layout>horizontal</Layout>
               <Connection><ConfigKey>[Skin],show_mixer</ConfigKey><BindProperty>visible</BindProperty></Connection>
               <Children>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>HI</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>MID</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>LO</Text></Label>
-                <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text></Label>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>HI</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k5</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; HI</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k5</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>MID</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k6</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; MID</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k6</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>LO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k7</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; LO</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k7</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
+                <WidgetGroup><Size>120,12</Size><Children>
+                  <Label><ObjectName>KnobLabel</ObjectName><Size>120,12</Size><Text>VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k8</ConfigKey><BindProperty>visible</BindProperty><Transform><Not/></Transform></Connection></Label>
+                  <Label><ObjectName>KnobLabelAuto</ObjectName><Size>120,12</Size><Text>&#x21BA; VOL</Text>
+                    <Connection><ConfigKey>[Skin],auto_touch_k8</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                </Children></WidgetGroup>
               </Children>
             </WidgetGroup>
           </Children>
