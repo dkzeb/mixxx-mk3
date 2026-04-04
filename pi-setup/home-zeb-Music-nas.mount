@@ -5,7 +5,7 @@ Wants=network-online.target
 RequiresMountsFor=/home/zeb/Music
 
 [Mount]
-What=//hines-proxmox/DJ Stems
+What=//100.87.17.101/DJ Stems
 Where=/home/zeb/Music/nas
 Type=cifs
 Options=guest,uid=zeb,gid=zeb,vers=2.0,nodfs,_netdev,nofail,iocharset=utf8,file_mode=0755,dir_mode=0755
