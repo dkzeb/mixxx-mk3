@@ -1,0 +1,15 @@
+[Unit]
+Description=Mount DJ music from SMB share
+After=network-online.target tailscaled.service
+Wants=network-online.target
+RequiresMountsFor=/home/zeb/Music
+
+[Mount]
+What=//hines-proxmox/DJ Musik
+Where=/home/zeb/Music/nas
+Type=cifs
+Options=guest,uid=zeb,gid=zeb,vers=2.0,nodfs,_netdev,nofail,iocharset=utf8,file_mode=0755,dir_mode=0755
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target

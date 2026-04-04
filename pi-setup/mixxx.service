@@ -1,7 +1,7 @@
 [Unit]
 Description=Mixxx DJ Software
-After=sound.target openbox.service
-Wants=openbox.service
+After=sound.target openbox.service home-zeb-Music-nas.mount
+Wants=openbox.service home-zeb-Music-nas.mount
 
 [Service]
 Type=simple

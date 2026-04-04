@@ -40,7 +40,8 @@ sudo apt-get install -y \
     feh \
     wireplumber \
     dmz-cursor-theme \
-    x11-xserver-utils
+    x11-xserver-utils \
+    cifs-utils
 
 # ── 2. Build screen daemon ──────────────────────────────────────────
 echo "--- [2/9] Building screen daemon ---"
@@ -247,8 +248,39 @@ else
     echo "You can set it up later via Settings > Network > Setup VPN on the MK3."
 fi
 
-# ── 9. Verify ───────────────────────────────────────────────────────
-echo "--- [9/9] Verifying ---"
+# ── 9. SMB music share ─────────────────────────────────────────────
+echo "--- [9/10] Setting up SMB music share ---"
+mkdir -p "$PI_HOME/Music/nas"
+
+if [ ! -f /etc/samba/credentials ]; then
+    sudo mkdir -p /etc/samba
+    echo ""
+    read -p "SMB username: " SMB_USER
+    read -sp "SMB password: " SMB_PASS
+    echo ""
+    printf "username=%s\npassword=%s\n" "$SMB_USER" "$SMB_PASS" | sudo tee /etc/samba/credentials > /dev/null
+    sudo chmod 600 /etc/samba/credentials
+    echo "SMB credentials saved to /etc/samba/credentials"
+else
+    echo "SMB credentials already exist at /etc/samba/credentials"
+fi
+
+# Install systemd mount unit (filename must match mount path: home-zeb-Music-nas.mount)
+sed -e "s|uid=zeb|uid=$PI_USER|" \
+    -e "s|gid=zeb|gid=$PI_USER|" \
+    -e "s|/home/zeb/Music|$PI_HOME/Music|g" \
+    "$SCRIPT_DIR/home-zeb-Music-nas.mount" | sudo tee /etc/systemd/system/home-zeb-Music-nas.mount > /dev/null
+
+sudo systemctl daemon-reload
+sudo systemctl enable home-zeb-Music-nas.mount
+echo "SMB share will mount to $PI_HOME/Music/nas on boot"
+
+# Also add nas directory to Mixxx library
+sqlite3 "$MIXXX_DB" "INSERT OR IGNORE INTO directories (directory) VALUES ('$PI_HOME/Music/nas');"
+echo "Added $PI_HOME/Music/nas to Mixxx library"
+
+# ── 10. Verify ──────────────────────────────────────────────────────
+echo "--- [10/10] Verifying ---"
 echo "  Xvfb:    $(which Xvfb)"
 echo "  openbox: $(which openbox)"
 echo "  Mixxx:   $(mixxx --version 2>&1 | head -1)"
@@ -264,9 +296,10 @@ echo ""
 echo "Boot sequence:"
 echo "  1. Xvfb starts (virtual 960x544 display on :99)"
 echo "  2. openbox starts (no decorations, auto-fullscreen)"
-echo "  3. Mixxx starts fullscreen on the virtual display"
-echo "  4. mk3-screen-daemon captures display → mirrors to MK3 screens"
-echo "  5. MK3 HID mapping auto-loads → controls are live"
+echo "  3. SMB music share mounts to $PI_HOME/Music/nas"
+echo "  4. Mixxx starts fullscreen on the virtual display"
+echo "  5. mk3-screen-daemon captures display → mirrors to MK3 screens"
+echo "  6. MK3 HID mapping auto-loads → controls are live"
 echo ""
 echo "Reboot to start:"
 echo "  sudo reboot"
