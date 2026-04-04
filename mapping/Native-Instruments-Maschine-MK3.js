@@ -477,30 +477,15 @@ MaschineMK3.selectLibraryTab = function(tabName) {
     var targetIdx = MaschineMK3.LIBRARY_TABS[tabName];
     if (targetIdx === undefined) { return; }
     var delta = targetIdx - MaschineMK3.librarySidebarPos;
-    if (delta === 0) {
-        engine.setValue("[Library]", "focused_widget", 3);
-        return;
-    }
-    // Step 1: focus sidebar
+    if (delta === 0) { return; }
+    // Focus sidebar, navigate to target feature
     engine.setValue("[Library]", "focused_widget", 2);
-    // Step 2: navigate after sidebar has focus
     engine.beginTimer(50, function() {
         engine.setValue("[Playlist]", "SelectPlaylist", delta);
-        // Step 3: open the selected feature
-        engine.beginTimer(50, function() {
-            engine.setValue("[Library]", "GoToItem", 1);
-            engine.beginTimer(20, function() {
-                engine.setValue("[Library]", "GoToItem", 0);
-                // Step 4: focus track table
-                engine.beginTimer(50, function() {
-                    engine.setValue("[Library]", "focused_widget", 3);
-                }, true);
-            }, true);
-        }, true);
+        MaschineMK3.librarySidebarPos = targetIdx;
+        MaschineMK3.activeLibraryTab = tabName;
+        MaschineMK3.updateLibraryTabLEDs();
     }, true);
-    MaschineMK3.librarySidebarPos = targetIdx;
-    MaschineMK3.activeLibraryTab = tabName;
-    MaschineMK3.updateLibraryTabLEDs();
 };
 
 MaschineMK3.updateLibraryTabLEDs = function() {
@@ -841,11 +826,7 @@ MaschineMK3.onButtonPress = function(name) {
     case "d5": case "d6": case "d7": case "d8":
         var dNum = parseInt(name.charAt(1), 10);  // 1-8
         // Library tab switching: D1-D4 when library is visible
-        // DEBUG: flash settings LED to confirm D-button press reaches here
-        MaschineMK3.setLed("settings", 63);
         if (MaschineMK3.libraryVisible && MaschineMK3.libraryTabMap[name]) {
-            // DEBUG: flash fileSave LED to confirm library tab path
-            MaschineMK3.setLed("fileSave", 63);
             MaschineMK3.selectLibraryTab(MaschineMK3.libraryTabMap[name]);
             break;
         }
