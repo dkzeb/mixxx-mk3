@@ -1315,6 +1315,9 @@ MaschineMK3.parseReport01 = function(data) {
         var wasDown = MaschineMK3.lastButtonState[name] || false;
 
         if (pressed && !wasDown) {
+            if (name.charAt(0) === "d" && name.length === 2) {
+                print("[MK3] PRESS " + name + " libraryVisible=" + MaschineMK3.libraryVisible);
+            }
             MaschineMK3.onButtonPress(name);
         } else if (!pressed && wasDown) {
             MaschineMK3.onButtonRelease(name);
