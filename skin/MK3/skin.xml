@@ -383,7 +383,7 @@
                   <Size>44,0</Size>
                   <Children>
                     <KnobComposed>
-                      <TooltipId>channel_equalizer_parameter</TooltipId>
+                      <TooltipId>pregain</TooltipId>
                       <Size>40f,34f</Size>
                       <Knob>knob.svg</Knob>
                       <BackPath>knob_bg_purple.svg</BackPath>
@@ -392,7 +392,7 @@
                       <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter3</ConfigKey></Connection>
                     </KnobComposed>
                     <KnobComposed>
-                      <TooltipId>channel_equalizer_parameter</TooltipId>
+                      <TooltipId>pregain</TooltipId>
                       <Size>40f,34f</Size>
                       <Knob>knob.svg</Knob>
                       <BackPath>knob_bg_purple.svg</BackPath>
@@ -401,7 +401,7 @@
                       <Connection><ConfigKey>[EqualizerRack1_[Channel1]_Effect1],parameter2</ConfigKey></Connection>
                     </KnobComposed>
                     <KnobComposed>
-                      <TooltipId>channel_equalizer_parameter</TooltipId>
+                      <TooltipId>pregain</TooltipId>
                       <Size>40f,34f</Size>
                       <Knob>knob.svg</Knob>
                       <BackPath>knob_bg_purple.svg</BackPath>
@@ -687,7 +687,7 @@
                   <Size>44,0</Size>
                   <Children>
                     <KnobComposed>
-                      <TooltipId>channel_equalizer_parameter</TooltipId>
+                      <TooltipId>pregain</TooltipId>
                       <Size>40f,34f</Size>
                       <Knob>knob.svg</Knob>
                       <BackPath>knob_bg_purple.svg</BackPath>
@@ -696,7 +696,7 @@
                       <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter3</ConfigKey></Connection>
                     </KnobComposed>
                     <KnobComposed>
-                      <TooltipId>channel_equalizer_parameter</TooltipId>
+                      <TooltipId>pregain</TooltipId>
                       <Size>40f,34f</Size>
                       <Knob>knob.svg</Knob>
                       <BackPath>knob_bg_purple.svg</BackPath>
@@ -705,7 +705,7 @@
                       <Connection><ConfigKey>[EqualizerRack1_[Channel2]_Effect1],parameter2</ConfigKey></Connection>
                     </KnobComposed>
                     <KnobComposed>
-                      <TooltipId>channel_equalizer_parameter</TooltipId>
+                      <TooltipId>pregain</TooltipId>
                       <Size>40f,34f</Size>
                       <Knob>knob.svg</Knob>
                       <BackPath>knob_bg_purple.svg</BackPath>
