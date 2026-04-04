@@ -24,6 +24,7 @@ sudo apt-get install -y \
     libfreetype-dev \
     libx11-dev \
     libxext-dev \
+    libxfixes-dev \
     xvfb \
     openbox \
     xdotool \
