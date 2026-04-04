@@ -305,7 +305,7 @@ MaschineMK3.libraryVisible  = false;    // whether the library panel is shown
 MaschineMK3.mixerVisible    = false;    // whether the mixer panel is shown
 MaschineMK3.overlayActive   = false;    // overlay widget has focus — suppress HID processing
 
-MaschineMK3.padMode       = null;      // null | "loops" | "effects" | "cuepoints" | "t9" — null = pads inactive
+MaschineMK3.padMode       = "cuepoints"; // "cuepoints" | "loops" | "effects" | "t9" — cuepoints is default
 
 // Effects pad mapping: pad number → {unit, slot} or {unit, "enable"}
 // Layout (physical, bottom to top):
@@ -581,12 +581,7 @@ MaschineMK3.updatePadLEDs = function() {
     // T9 mode: Python daemon controls pad LEDs
     if (MaschineMK3.padMode === "t9") { return; }
 
-    if (MaschineMK3.padMode === null) {
-        for (var pad = 1; pad <= 16; pad++) {
-            MaschineMK3.setLed(MaschineMK3.padPhysicalToLed[pad], C.OFF);
-        }
-        return;
-    }
+    // (no null/off state — cuepoints is the default)
 
     if (MaschineMK3.padMode === "cuepoints") {
         // Pads 1-8 = Deck 1 cues 1-8, pads 9-16 = Deck 2 cues 1-8
@@ -724,7 +719,7 @@ MaschineMK3.onButtonPress = function(name) {
 
     // --- PadMode button: toggle cuepoints on pads ---
     case "padMode":
-        MaschineMK3.padMode = (MaschineMK3.padMode === "cuepoints") ? null : "cuepoints";
+        MaschineMK3.padMode = "cuepoints"; // always cuepoints — it's the default
         if (MaschineMK3.padMode === "cuepoints") {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
@@ -738,13 +733,13 @@ MaschineMK3.onButtonPress = function(name) {
     case "performFxSelect":
         if (MaschineMK3.shiftPressed) {
             // Shift + press: toggle effects mode on/off
-            MaschineMK3.padMode = (MaschineMK3.padMode === "effects") ? null : "effects";
+            MaschineMK3.padMode = (MaschineMK3.padMode === "effects") ? "cuepoints" : "effects";
         } else {
             // Normal press: toggle loops mode on/off
-            MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? null : "loops";
+            MaschineMK3.padMode = (MaschineMK3.padMode === "loops") ? "cuepoints" : "loops";
         }
         // Close library/mixer if opening a pad mode
-        if (MaschineMK3.padMode !== null) {
+        if (MaschineMK3.padMode !== "cuepoints") {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
         }
@@ -796,7 +791,7 @@ MaschineMK3.onButtonPress = function(name) {
             MaschineMK3.mixerVisible = false;
             MaschineMK3.padMode = "t9";
         } else {
-            MaschineMK3.padMode = null;
+            MaschineMK3.padMode = "cuepoints";
         }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
@@ -809,7 +804,7 @@ MaschineMK3.onButtonPress = function(name) {
         if (MaschineMK3.mixerVisible) {
             MaschineMK3.libraryVisible = false;
         }
-        if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = null; }
+        if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = "cuepoints"; }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
@@ -842,7 +837,7 @@ MaschineMK3.onButtonPress = function(name) {
             } else {
                 engine.setValue("[Channel" + MaschineMK3.activeDeck + "]", "LoadSelectedTrack", 1);
                 MaschineMK3.libraryVisible = false;
-                MaschineMK3.padMode = null;
+                MaschineMK3.padMode = "cuepoints";
                 MaschineMK3.updatePadModeLED();
                 MaschineMK3.updatePadLEDs();
                 MaschineMK3.updatePanels();
@@ -1041,7 +1036,7 @@ MaschineMK3.onStepperChange = function(direction) {
 // padNumber: physical pad number (1-16).
 // ---------------------------------------------------------------------------
 MaschineMK3.onPadPress = function(padNumber) {
-    if (MaschineMK3.padMode === null || MaschineMK3.padMode === "t9") { return; }
+    if (MaschineMK3.padMode === "t9") { return; }
     var ch = "[Channel" + MaschineMK3.activeDeck + "]";
 
     if (MaschineMK3.padMode === "cuepoints") {
