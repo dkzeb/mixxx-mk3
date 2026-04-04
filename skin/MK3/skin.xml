@@ -823,7 +823,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck1.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel1Stem1],volume</ConfigKey>
+                        <ConfigKey>[Channel1_Stem1],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -839,7 +839,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel1Stem1],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel1_Stem1],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -858,7 +858,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck1.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel1Stem2],volume</ConfigKey>
+                        <ConfigKey>[Channel1_Stem2],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -874,7 +874,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel1Stem2],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel1_Stem2],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -893,7 +893,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck1.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel1Stem3],volume</ConfigKey>
+                        <ConfigKey>[Channel1_Stem3],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -909,7 +909,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel1Stem3],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel1_Stem3],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -928,7 +928,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck1.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel1Stem4],volume</ConfigKey>
+                        <ConfigKey>[Channel1_Stem4],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -944,7 +944,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel1Stem4],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel1_Stem4],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -973,7 +973,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck2.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel2Stem1],volume</ConfigKey>
+                        <ConfigKey>[Channel2_Stem1],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -989,7 +989,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel2Stem1],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel2_Stem1],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -1008,7 +1008,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck2.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel2Stem2],volume</ConfigKey>
+                        <ConfigKey>[Channel2_Stem2],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -1024,7 +1024,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel2Stem2],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel2_Stem2],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -1043,7 +1043,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck2.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel2Stem3],volume</ConfigKey>
+                        <ConfigKey>[Channel2_Stem3],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -1059,7 +1059,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel2Stem3],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel2_Stem3],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>
@@ -1078,7 +1078,7 @@
                       <Handle scalemode="STRETCH_ASPECT">handle-volume-deck2.svg</Handle>
                       <Horizontal>false</Horizontal>
                       <Connection>
-                        <ConfigKey>[Channel2Stem4],volume</ConfigKey>
+                        <ConfigKey>[Channel2_Stem4],volume</ConfigKey>
                         <EmitOnDownPress>false</EmitOnDownPress>
                       </Connection>
                     </SliderComposed>
@@ -1094,7 +1094,7 @@
                         <Unpressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Unpressed>
                         <Pressed scalemode="STRETCH_ASPECT">btn_stem_muted.svg</Pressed>
                       </State>
-                      <Connection><ConfigKey>[Channel2Stem4],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
+                      <Connection><ConfigKey>[Channel2_Stem4],mute</ConfigKey><ButtonState>LeftButton</ButtonState></Connection>
                     </PushButton>
                   </Children>
                 </WidgetGroup>

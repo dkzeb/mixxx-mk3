@@ -328,7 +328,7 @@ MaschineMK3.updateStemLEDs = function() {
     for (var deck = 1; deck <= 2; deck++) {
         for (var stem = 1; stem <= 4; stem++) {
             var gName = "g" + ((deck - 1) * 4 + stem);
-            var stemGroup = "[Channel" + deck + "Stem" + stem + "]";
+            var stemGroup = "[Channel" + deck + "_Stem" + stem + "]";
             var isMuted = engine.getValue(stemGroup, "mute");
             if (isMuted) {
                 MaschineMK3.setLed(gName, MaschineMK3.Color.OFF);
@@ -859,14 +859,14 @@ MaschineMK3.onButtonPress = function(name) {
         var gIdx = parseInt(name.charAt(1), 10);  // 1-8
         var gDeck = gIdx <= 4 ? 1 : 2;
         var gStem = gIdx <= 4 ? gIdx : gIdx - 4;  // stem 1-4
-        var stemGroup = "[Channel" + gDeck + "Stem" + gStem + "]";
+        var stemGroup = "[Channel" + gDeck + "_Stem" + gStem + "]";
         if (MaschineMK3.shiftPressed) {
             // Shift+G: solo/unsolo this stem (mute all others, or unmute all if already solo)
             var allOthersMuted = true;
             var thisMuted = engine.getValue(stemGroup, "mute");
             for (var s = 1; s <= 4; s++) {
                 if (s !== gStem) {
-                    if (!engine.getValue("[Channel" + gDeck + "Stem" + s + "]", "mute")) {
+                    if (!engine.getValue("[Channel" + gDeck + "_Stem" + s + "]", "mute")) {
                         allOthersMuted = false;
                         break;
                     }
@@ -875,12 +875,12 @@ MaschineMK3.onButtonPress = function(name) {
             if (allOthersMuted && !thisMuted) {
                 // Already solo — unsolo (unmute all)
                 for (var s2 = 1; s2 <= 4; s2++) {
-                    engine.setValue("[Channel" + gDeck + "Stem" + s2 + "]", "mute", 0);
+                    engine.setValue("[Channel" + gDeck + "_Stem" + s2 + "]", "mute", 0);
                 }
             } else {
                 // Solo: mute all others, unmute this
                 for (var s3 = 1; s3 <= 4; s3++) {
-                    engine.setValue("[Channel" + gDeck + "Stem" + s3 + "]", "mute", s3 !== gStem ? 1 : 0);
+                    engine.setValue("[Channel" + gDeck + "_Stem" + s3 + "]", "mute", s3 !== gStem ? 1 : 0);
                 }
             }
         } else {
@@ -1147,7 +1147,7 @@ MaschineMK3.getKnobBinding = function(knobName) {
             : {k1: 1, k2: 2, k3: 3, k4: 4};
         var stemNum = stemKnobs[knobName];
         if (stemNum) {
-            var stemGroup = "[Channel" + MaschineMK3.activeDeck + "Stem" + stemNum + "]";
+            var stemGroup = "[Channel" + MaschineMK3.activeDeck + "_Stem" + stemNum + "]";
             if (MaschineMK3.shiftPressed) {
                 return {group: stemGroup, key: "pan"};
             }
@@ -1260,7 +1260,7 @@ MaschineMK3.onKnobChange = function(name, value) {
             : {k1: 1, k2: 2, k3: 3, k4: 4};
         var stemNum = stemKnobs[name];
         if (stemNum) {
-            var stemGroup = "[Channel" + MaschineMK3.activeDeck + "Stem" + stemNum + "]";
+            var stemGroup = "[Channel" + MaschineMK3.activeDeck + "_Stem" + stemNum + "]";
             if (MaschineMK3.shiftPressed) {
                 MaschineMK3.adjustValue(stemGroup, "pan", delta, 0.005, 0, 1);
             } else {
@@ -1594,7 +1594,7 @@ MaschineMK3.init = function(/* id, debugging */) {
     for (var sDeck = 1; sDeck <= 2; sDeck++) {
         for (var sStem = 1; sStem <= 4; sStem++) {
             (function(d, s) {
-                var stemGroup = "[Channel" + d + "Stem" + s + "]";
+                var stemGroup = "[Channel" + d + "_Stem" + s + "]";
                 engine.makeConnection(stemGroup, "mute",
                     function() { MaschineMK3.updateStemLEDs(); });
                 engine.makeConnection(stemGroup, "volume",
