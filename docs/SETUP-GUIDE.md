@@ -72,8 +72,8 @@ SSH back in after it comes back up.
 
 ```bash
 sudo apt-get install -y git
-git clone https://github.com/YOUR-USERNAME/mixx-mk3.git
-cd mixx-mk3
+git clone https://github.com/YOUR-USERNAME/mixxx-mk3.git
+cd mixxx-mk3
 ```
 
 (Replace the URL with wherever you host this repo, or copy it via `scp`.)
@@ -100,7 +100,7 @@ If you don't see it, try a different USB port. The MK3 needs USB 2.0+.
 ## Step 6: Run the Setup Script
 
 ```bash
-cd ~/mixx-mk3
+cd ~/mixxx-mk3
 sudo ./pi-setup/mk3-pi-setup.sh
 ```
 

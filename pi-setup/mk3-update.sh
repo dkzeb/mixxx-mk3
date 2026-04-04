@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Quick update script — pulls latest from git and applies changes.
 # Run from anywhere on the Pi: bash /path/to/mk3-update.sh
-# Or if the repo is cloned: cd ~/mixx-mk3 && bash pi-setup/mk3-update.sh
+# Or if the repo is cloned: cd ~/mixxx-mk3 && bash pi-setup/mk3-update.sh
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -56,11 +56,11 @@ for svc in mk3-screen-daemon.service openbox.service xvfb.service; do
             "$SCRIPT_DIR/$svc" | sudo tee /etc/systemd/system/$svc > /dev/null
     fi
 done
-for svc in mixxx.service mk3-settings-watcher.service mk3-t9-daemon.service; do
+for svc in mixxx.service mk3-t9-daemon.service mk3-mouse-daemon.service mk3-overlay.service; do
     if [ -f "$SCRIPT_DIR/$svc" ]; then
         sed -e "s/User=pi/User=$PI_USER/" \
             -e "s|HOME=/home/pi|HOME=$PI_HOME|" \
-            -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
+            -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
             -e "s|/run/user/1000|/run/user/$UID_NUM|" \
             "$SCRIPT_DIR/$svc" | sudo tee /etc/systemd/system/$svc > /dev/null
     fi

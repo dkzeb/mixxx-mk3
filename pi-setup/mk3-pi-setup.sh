@@ -187,36 +187,36 @@ sudo rm -f /etc/systemd/system/pipewire.service /etc/systemd/system/wireplumber.
 # Mixxx — patched for this user (uses pw-jack for PipeWire audio)
 sed -e "s/User=pi/User=$PI_USER/" \
     -e "s|HOME=/home/pi|HOME=$PI_HOME|" \
-    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
+    -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
     -e "s|/run/user/1000|/run/user/$UID_NUM|" \
     "$SCRIPT_DIR/mixxx.service" | sudo tee /etc/systemd/system/mixxx.service > /dev/null
 
 sudo cp "$SCRIPT_DIR/mk3-screen-daemon.service" /etc/systemd/system/
 
-# Settings watcher — patched for this user
-sed -e "s/User=pi/User=$PI_USER/" \
-    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
-    -e "s|/run/user/1000|/run/user/$UID_NUM|" \
-    "$SCRIPT_DIR/mk3-settings-watcher.service" | sudo tee /etc/systemd/system/mk3-settings-watcher.service > /dev/null
-
 # T9 text input daemon — patched for this user
 sed -e "s/User=pi/User=$PI_USER/" \
-    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
+    -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
     "$SCRIPT_DIR/mk3-t9-daemon.service" | sudo tee /etc/systemd/system/mk3-t9-daemon.service > /dev/null
 
 # Mouse mode daemon — patched for this user
 sed -e "s/User=pi/User=$PI_USER/" \
-    -e "s|/home/pi/mixx-mk3|$PI_HOME/mixx-mk3|" \
+    -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
     "$SCRIPT_DIR/mk3-mouse-daemon.service" | sudo tee /etc/systemd/system/mk3-mouse-daemon.service > /dev/null
+
+# Overlay widget system — patched for this user
+sed -e "s/User=pi/User=$PI_USER/" \
+    -e "s|HOME=/home/pi|HOME=$PI_HOME|" \
+    -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
+    "$SCRIPT_DIR/mk3-overlay.service" | sudo tee /etc/systemd/system/mk3-overlay.service > /dev/null
 
 sudo systemctl daemon-reload
 sudo systemctl enable xvfb.service
 sudo systemctl enable openbox.service
 sudo systemctl enable mk3-screen-daemon.service
 sudo systemctl enable mixxx.service
-sudo systemctl enable mk3-settings-watcher.service
 sudo systemctl enable mk3-t9-daemon.service
 sudo systemctl enable mk3-mouse-daemon.service
+sudo systemctl enable mk3-overlay.service
 
 # Add user to required groups
 sudo usermod -aG audio "$PI_USER"

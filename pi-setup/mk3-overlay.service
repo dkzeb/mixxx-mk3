@@ -9,7 +9,7 @@ User=pi
 Environment=DISPLAY=:99
 Environment=HOME=/home/pi
 ExecStart=/usr/bin/python3 -m mk3_overlay.daemon
-WorkingDirectory=/home/pi/mixx-mk3/pi-setup
+WorkingDirectory=/home/pi/mixxx-mk3/pi-setup
 Restart=always
 RestartSec=3
 

@@ -7,7 +7,7 @@
 
 set -uo pipefail
 
-PROJECT_DIR="${MK3_PROJECT_DIR:-/home/$(whoami)/mixx-mk3}"
+PROJECT_DIR="${MK3_PROJECT_DIR:-/home/$(whoami)/mixxx-mk3}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DISPLAY="${DISPLAY:-:99}"
 export DISPLAY

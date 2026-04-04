@@ -7,7 +7,7 @@ Wants=xvfb.service
 Type=simple
 User=pi
 Environment=DISPLAY=:99
-ExecStart=/usr/bin/python3 /home/pi/mixx-mk3/pi-setup/mk3-t9-daemon.py
+ExecStart=/usr/bin/python3 /home/pi/mixxx-mk3/pi-setup/mk3-t9-daemon.py
 Restart=on-failure
 RestartSec=3
 
