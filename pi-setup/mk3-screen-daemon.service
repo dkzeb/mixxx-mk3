@@ -1,7 +1,7 @@
 [Unit]
 Description=MK3 Screen Mirroring Daemon
 After=openbox.service
-Requires=openbox.service
+Wants=openbox.service
 
 [Service]
 Type=simple
