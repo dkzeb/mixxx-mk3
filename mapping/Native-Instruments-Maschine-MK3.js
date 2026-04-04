@@ -319,10 +319,9 @@ MaschineMK3.LIBRARY_TABS = {
     "prepare":   7
 };
 // D-button → tab mapping (only active when library is open)
-// D1=Tracks, D2=unused, D3=Prepare, D4=Rescan
+// D1=Tracks, D3=Analyze all, D4=Rescan
 MaschineMK3.libraryTabMap = {
-    "d1": "tracks",
-    "d3": "prepare"
+    "d1": "tracks"
 };
 MaschineMK3.librarySidebarPos = 0;  // current sidebar index
 
@@ -500,6 +499,7 @@ MaschineMK3.updateLibraryTabLEDs = function() {
             MaschineMK3.setLed(dBtn, map[dBtn] === MaschineMK3.activeLibraryTab ? 63 : 16);
         }
     }
+    MaschineMK3.setLed("d3", 16);  // Analyze — always dim (action, not tab)
     MaschineMK3.setLed("d4", 16);  // Rescan — always dim (action, not tab)
 };
 
@@ -834,6 +834,10 @@ MaschineMK3.onButtonPress = function(name) {
         // Library tab switching: D1-D4 when library is visible
         if (MaschineMK3.libraryVisible && MaschineMK3.libraryTabMap[name]) {
             MaschineMK3.selectLibraryTab(MaschineMK3.libraryTabMap[name]);
+            break;
+        }
+        if (MaschineMK3.libraryVisible && name === "d3") {
+            engine.setValue("[Library]", "analyzeTracks", 1);
             break;
         }
         if (MaschineMK3.libraryVisible && name === "d4") {

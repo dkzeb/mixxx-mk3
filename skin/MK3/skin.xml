@@ -317,7 +317,7 @@
           <Children>
             <Label><ObjectName>DLabelActive</ObjectName><Size>120,12</Size><Text>TRACKS</Text></Label>
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text></Text></Label>
-            <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>PREPARE</Text></Label>
+            <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>ANALYZE</Text></Label>
             <Label><ObjectName>DLabel</ObjectName><Size>120,12</Size><Text>RESCAN</Text></Label>
           </Children>
         </WidgetGroup>
