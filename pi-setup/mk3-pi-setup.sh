@@ -144,14 +144,16 @@ sudo rm -f /etc/asound.conf
 cat > "$PI_HOME/.mixxx/soundconfig.xml" << 'SNDEOF'
 <!DOCTYPE SoundManagerConfig>
 <SoundManagerConfig api="JACK Audio Connection Kit" deck_count="2" force_network_clock="0" latency="5" samplerate="48000" sync_buffers="2">
- <SoundDevice name="Maschine MK3 Analog Surround 4.0" portAudioIndex="7">
+ <SoundDevice name="Maschine MK3 Analog Surround 4.0" portAudioIndex="6">
   <output channel="0" channel_count="2" index="0" type="Master"/>
-  <output channel="2" channel_count="2" index="0" type="Headphones"/>
+ </SoundDevice>
+ <SoundDevice name="Built-in Audio Stereo" portAudioIndex="3">
+  <output channel="0" channel_count="2" index="0" type="Headphones"/>
  </SoundDevice>
 </SoundManagerConfig>
 SNDEOF
 chown "$PI_USER:$PI_USER" "$PI_HOME/.mixxx/soundconfig.xml"
-echo "Mixxx audio: MK3 via PipeWire/JACK (master ch 0-1, headphones ch 2-3)"
+echo "Mixxx audio: master on MK3, headphones on Pi 3.5mm jack"
 
 # ── 5. Configure openbox for fullscreen (no decorations) ────────────
 echo "--- [5/9] Configuring openbox (fullscreen, no decorations) ---"
