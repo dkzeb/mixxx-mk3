@@ -7,6 +7,13 @@
 // eslint-disable-next-line no-var
 var MaschineMK3 = {};
 
+// --- Vinyl scratch configuration ---
+var VINYL_ENABLED = true;          // Touch K2/K6 to scratch (false = jog nudge only)
+var VINYL_RESOLUTION = 128;        // Ticks per revolution (higher = finer control)
+var VINYL_RPM = 33.33;             // Virtual platter speed
+var VINYL_ALPHA = 1.0 / 8;         // Scratch filter (lower = smoother, less responsive)
+var VINYL_BETA = VINYL_ALPHA / 32; // Scratch filter ramping
+
 // --- Tempo ramp configuration ---
 var RAMP_BPM_PER_SEC = 2.0;
 var RAMP_INTERVAL_MS = 50;
@@ -1025,12 +1032,12 @@ MaschineMK3.onButtonPress = function(name) {
             MaschineMK3.autoSnapSave(knobName);
         }
         // Vinyl scratch: touching K2 or K6 enables scratch mode
-        if (knobName === "k2" && !MaschineMK3.tempoVisible && !MaschineMK3.mixerVisible && !MaschineMK3.stemMixerVisible) {
+        if (VINYL_ENABLED && knobName === "k2" && !MaschineMK3.tempoVisible && !MaschineMK3.mixerVisible && !MaschineMK3.stemMixerVisible) {
             MaschineMK3.scratchingDeck1 = true;
-            engine.scratchEnable(1, 128, 33.33, 1.0/8, 1.0/8/32);
-        } else if (knobName === "k6" && !MaschineMK3.tempoVisible && !MaschineMK3.mixerVisible && !MaschineMK3.stemMixerVisible) {
+            engine.scratchEnable(1, VINYL_RESOLUTION, VINYL_RPM, VINYL_ALPHA, VINYL_BETA);
+        } else if (VINYL_ENABLED && knobName === "k6" && !MaschineMK3.tempoVisible && !MaschineMK3.mixerVisible && !MaschineMK3.stemMixerVisible) {
             MaschineMK3.scratchingDeck2 = true;
-            engine.scratchEnable(2, 128, 33.33, 1.0/8, 1.0/8/32);
+            engine.scratchEnable(2, VINYL_RESOLUTION, VINYL_RPM, VINYL_ALPHA, VINYL_BETA);
         }
         return;
     }
