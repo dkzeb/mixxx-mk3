@@ -46,6 +46,10 @@ TOGGLE_MASK = 0x04
 SETTINGS_BYTE = 0x07
 SETTINGS_MASK = 0x02
 
+# channelMidi button: Report 0x01, byte 0x08, mask 0x01
+CHANNEL_BYTE = 0x08
+CHANNEL_MASK = 0x01
+
 # Mouse mode toggle: Auto (0x08, 0x20) + Macro (0x07, 0x01)
 MOUSE_AUTO_BYTE = 0x08
 MOUSE_AUTO_MASK = 0x20
@@ -247,6 +251,7 @@ def main():
         t9_active = False
         toggle_was_pressed = False
         settings_was_pressed = False
+        channel_was_pressed = False
         mouse_auto_was = False
         mouse_macro_was = False
         pad_was_pressed = {}  # physical pad -> bool
@@ -330,6 +335,13 @@ def main():
                         print(f"{LOG_PREFIX}: settings pressed, deactivating T9", file=sys.stderr)
                         deactivate_t9()
                     settings_was_pressed = settings_pressed
+
+                    # --- Channel button: deactivate T9 if active ---
+                    channel_pressed = (data[CHANNEL_BYTE] & CHANNEL_MASK) != 0
+                    if channel_pressed and not channel_was_pressed and t9_active:
+                        print(f"{LOG_PREFIX}: channel pressed, deactivating T9", file=sys.stderr)
+                        deactivate_t9()
+                    channel_was_pressed = channel_pressed
 
                     # --- Mouse mode combo: deactivate T9 ---
                     m_auto = (data[MOUSE_AUTO_BYTE] & MOUSE_AUTO_MASK) != 0
