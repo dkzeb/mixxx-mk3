@@ -532,6 +532,9 @@ MaschineMK3.toggleTempoPanel = function() {
     }
     MaschineMK3.updateTempoLed();
     MaschineMK3.updatePanels();
+    if (MaschineMK3.tempoVisible) {
+        MaschineMK3.updateTempoDButtonLEDs();
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -543,6 +546,21 @@ MaschineMK3.updateTempoLed = function() {
         return;
     }
     MaschineMK3.setLed("tempo", MaschineMK3.tempoVisible ? 63 : 0);
+};
+
+// ---------------------------------------------------------------------------
+// updateTempoDButtonLEDs — set D-button LEDs for tempo panel state.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateTempoDButtonLEDs = function() {
+    if (!MaschineMK3.tempoVisible) { return; }
+    MaschineMK3.setLed("d1", engine.getValue("[Channel1]", "sync_enabled") ? 63 : 16);
+    MaschineMK3.setLed("d5", engine.getValue("[Channel2]", "sync_enabled") ? 63 : 16);
+    MaschineMK3.setLed("d2", engine.getValue("[Channel1]", "keylock") ? 63 : 16);
+    MaschineMK3.setLed("d6", engine.getValue("[Channel2]", "keylock") ? 63 : 16);
+    MaschineMK3.setLed("d3", MaschineMK3.tempoState.rampTimerA ? 63 : 16);
+    MaschineMK3.setLed("d7", MaschineMK3.tempoState.rampTimerB ? 63 : 16);
+    MaschineMK3.setLed("d4", 16);
+    MaschineMK3.setLed("d8", 16);
 };
 
 // ---------------------------------------------------------------------------
@@ -565,6 +583,111 @@ MaschineMK3.handleRampTargetKnob = function(deck, delta) {
             MaschineMK3.tempoState[mulKey]--;
         }
     }
+};
+
+// ---------------------------------------------------------------------------
+// startRamp — begin ramping a deck toward the opposite deck's BPM × multiplier.
+// ---------------------------------------------------------------------------
+MaschineMK3.startRamp = function(deck) {
+    var timerKey = (deck === 1) ? "rampTimerA" : "rampTimerB";
+
+    // Disable sync on the ramping deck (sync would fight the ramp)
+    engine.setValue("[Channel" + deck + "]", "sync_enabled", 0);
+
+    MaschineMK3.tempoState[timerKey] = engine.beginTimer(RAMP_INTERVAL_MS, function() {
+        MaschineMK3.rampTick(deck);
+    });
+
+    // Start LED pulse if not already running
+    if (!MaschineMK3.tempoState.rampLedTimer) {
+        MaschineMK3.tempoState.rampLedTimer = engine.beginTimer(500, function() {
+            MaschineMK3.updateRampLed();
+        });
+    }
+
+    // Show ramp indicator on deck screen
+    engine.setValue("[Skin]", "show_ramp_" + (deck === 1 ? "a" : "b"), 1);
+
+    // Update D-button LED
+    MaschineMK3.setLed(deck === 1 ? "d3" : "d7", 63);
+};
+
+// ---------------------------------------------------------------------------
+// stopRamp — stop ramping a deck. Cleans up timer, LED, indicators.
+// ---------------------------------------------------------------------------
+MaschineMK3.stopRamp = function(deck) {
+    var timerKey = (deck === 1) ? "rampTimerA" : "rampTimerB";
+
+    if (MaschineMK3.tempoState[timerKey]) {
+        engine.stopTimer(MaschineMK3.tempoState[timerKey]);
+        MaschineMK3.tempoState[timerKey] = 0;
+    }
+
+    // Hide ramp indicator on deck screen
+    engine.setValue("[Skin]", "show_ramp_" + (deck === 1 ? "a" : "b"), 0);
+
+    // Reset D-button LED
+    MaschineMK3.setLed(deck === 1 ? "d3" : "d7", 16);
+
+    // Stop LED pulse if no ramps active
+    if (!MaschineMK3.tempoState.rampTimerA && !MaschineMK3.tempoState.rampTimerB) {
+        if (MaschineMK3.tempoState.rampLedTimer) {
+            engine.stopTimer(MaschineMK3.tempoState.rampLedTimer);
+            MaschineMK3.tempoState.rampLedTimer = 0;
+            MaschineMK3.tempoState.rampLedState = false;
+        }
+        MaschineMK3.updateTempoLed();
+    }
+};
+
+// ---------------------------------------------------------------------------
+// rampTick — called every RAMP_INTERVAL_MS. Adjusts rate toward target BPM.
+// ---------------------------------------------------------------------------
+MaschineMK3.rampTick = function(deck) {
+    var channel = "[Channel" + deck + "]";
+    var oppDeck = (deck === 1) ? 2 : 1;
+    var oppChannel = "[Channel" + oppDeck + "]";
+    var mulKey = (deck === 1) ? "rampMultiplierA" : "rampMultiplierB";
+    var multiplier = RAMP_MULTIPLIERS[MaschineMK3.tempoState[mulKey]];
+
+    var currentBpm = engine.getValue(channel, "bpm");
+    var oppBpm = engine.getValue(oppChannel, "bpm");
+    var targetBpm = oppBpm * multiplier;
+
+    var diff = targetBpm - currentBpm;
+
+    if (Math.abs(diff) <= RAMP_THRESHOLD_BPM) {
+        MaschineMK3.stopRamp(deck);
+        return;
+    }
+
+    var bpmPerTick = RAMP_BPM_PER_SEC * (RAMP_INTERVAL_MS / 1000.0);
+    var step = (diff > 0) ? Math.min(bpmPerTick, diff) : Math.max(-bpmPerTick, diff);
+
+    var fileBpm = engine.getValue(channel, "file_bpm");
+    var rateRange = engine.getValue(channel, "rateRange");
+
+    if (fileBpm <= 0 || rateRange <= 0) {
+        MaschineMK3.stopRamp(deck);
+        return;
+    }
+
+    var currentRate = engine.getValue(channel, "rate");
+    var rateDelta = step / (fileBpm * rateRange * 2);
+    var newRate = currentRate + rateDelta;
+
+    if (newRate < -1) { newRate = -1; MaschineMK3.stopRamp(deck); }
+    else if (newRate > 1) { newRate = 1; MaschineMK3.stopRamp(deck); }
+
+    engine.setValue(channel, "rate", newRate);
+};
+
+// ---------------------------------------------------------------------------
+// updateRampLed — pulse TEMPO button LED while any ramp is active.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateRampLed = function() {
+    MaschineMK3.tempoState.rampLedState = !MaschineMK3.tempoState.rampLedState;
+    MaschineMK3.setLed("tempo", MaschineMK3.tempoState.rampLedState ? 63 : 0);
 };
 
 // ---------------------------------------------------------------------------
@@ -1776,9 +1899,18 @@ MaschineMK3.init = function(/* id, debugging */) {
     };
 
     // --- Track loaded: reconnect stem LEDs, close library/T9 ---
-    MaschineMK3.onTrackLoaded = function() {
+    MaschineMK3.onTrackLoaded = function(value, group) {
         // Reconnect stem LEDs (stem controls only exist after loading a stem file)
         MaschineMK3.connectStemLEDs();
+
+        if (value) {
+            // Stop any active ramp on this deck
+            var loadedDeck = (group === "[Channel1]") ? 1 : 2;
+            var timerKey = (loadedDeck === 1) ? "rampTimerA" : "rampTimerB";
+            if (MaschineMK3.tempoState[timerKey]) {
+                MaschineMK3.stopRamp(loadedDeck);
+            }
+        }
 
         if (MaschineMK3.libraryVisible) {
             MaschineMK3.libraryVisible = false;
@@ -1808,6 +1940,28 @@ MaschineMK3.init = function(/* id, debugging */) {
     });
     engine.makeConnection("[Channel2]", "sync_enabled", function(value) {
         MaschineMK3.setLed("d5", value ? 63 : 16);
+    });
+    // Stop ramp if sync is enabled on the ramping deck
+    engine.makeConnection("[Channel1]", "sync_enabled", function(value) {
+        if (value && MaschineMK3.tempoState.rampTimerA) {
+            MaschineMK3.stopRamp(1);
+        }
+    });
+    engine.makeConnection("[Channel2]", "sync_enabled", function(value) {
+        if (value && MaschineMK3.tempoState.rampTimerB) {
+            MaschineMK3.stopRamp(2);
+        }
+    });
+    // Keylock LED feedback
+    engine.makeConnection("[Channel1]", "keylock", function(value) {
+        if (MaschineMK3.tempoVisible) {
+            MaschineMK3.setLed("d2", value ? 63 : 16);
+        }
+    });
+    engine.makeConnection("[Channel2]", "keylock", function(value) {
+        if (MaschineMK3.tempoVisible) {
+            MaschineMK3.setLed("d6", value ? 63 : 16);
+        }
     });
     // PFL (headphone cue) LED feedback + auto headMix routing
     MaschineMK3.updateHeadphoneRouting = function() {
@@ -1851,6 +2005,7 @@ MaschineMK3.init = function(/* id, debugging */) {
     // --- Browser + Mixer LEDs (dim = available); settings LED managed by overlay daemon ---
     MaschineMK3.setLed("browserPlugin", 16);
     MaschineMK3.setLed("mixer", 16);
+    MaschineMK3.setLed("tempo", 0);
     MaschineMK3.setLed("keyboard", 0);
 
     // --- Nav encoder LEDs (always dimly lit for navigation) ---
@@ -1911,6 +2066,10 @@ MaschineMK3.init = function(/* id, debugging */) {
 // shutdown — called by Mixxx when the mapping is unloaded.
 // ---------------------------------------------------------------------------
 MaschineMK3.shutdown = function() {
+    // Stop any active ramp timers
+    if (MaschineMK3.tempoState.rampTimerA) { engine.stopTimer(MaschineMK3.tempoState.rampTimerA); }
+    if (MaschineMK3.tempoState.rampTimerB) { engine.stopTimer(MaschineMK3.tempoState.rampTimerB); }
+    if (MaschineMK3.tempoState.rampLedTimer) { engine.stopTimer(MaschineMK3.tempoState.rampLedTimer); }
     // Blank all LEDs on shutdown
     for (var b = 1; b < MaschineMK3.report80.length; b++) {
         MaschineMK3.report80[b] = 0;
