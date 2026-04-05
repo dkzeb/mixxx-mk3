@@ -35,14 +35,27 @@ READER_PID=$!
 
 # ── Show dialog on MK3 screens ──────────────────────────────────────
 RESULT=1
+# Position zenity on left MK3 screen (480x272, origin 0,0)
+move_to_left_screen() {
+    for _ in $(seq 1 20); do
+        WID=$(xdotool search --name "$1" 2>/dev/null | head -1)
+        if [ -n "$WID" ]; then
+            xdotool windowmove "$WID" 0 0 2>/dev/null
+            xdotool windowsize "$WID" 480 272 2>/dev/null
+            return
+        fi
+        sleep 0.1
+    done
+}
 if command -v zenity &>/dev/null; then
+    move_to_left_screen "MK3 Update" &
     zenity --question \
         --title="MK3 Update" \
         --text="$BEHIND update(s) available.\n\nPress PLAY to update, STOP to skip." \
         --ok-label="Update Now [PLAY]" \
         --cancel-label="Later [STOP]" \
         --timeout=$TIMEOUT \
-        --width=400 2>/dev/null
+        --width=480 2>/dev/null
     RESULT=$?
 fi
 
@@ -54,9 +67,11 @@ wait $READER_PID 2>/dev/null
 if [ "$RESULT" -eq 0 ]; then
     echo "mk3-check-update: updating..."
 
-    # Show progress message
+    # Show progress message on left screen
+    move_to_left_screen "Updating" &
     zenity --info --text="Updating MK3...\nPlease wait." \
-        --no-wrap --timeout=120 --width=400 2>/dev/null &
+        --title="Updating" \
+        --no-wrap --timeout=120 --width=480 2>/dev/null &
     ZPID=$!
 
     git pull --ff-only origin master 2>&1 | tail -5
