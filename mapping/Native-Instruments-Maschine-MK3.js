@@ -326,8 +326,15 @@ MaschineMK3.rgbToPaletteIndex = function(rgb) {
 // ---------------------------------------------------------------------------
 MaschineMK3.updateStemLEDs = function() {
     for (var deck = 1; deck <= 2; deck++) {
+        // Check if this deck has stems loaded (stem_count > 0)
+        var stemCount = engine.getValue("[Channel" + deck + "]", "stem_count");
         for (var stem = 1; stem <= 4; stem++) {
             var gName = "g" + ((deck - 1) * 4 + stem);
+            if (!stemCount || stem > stemCount) {
+                // No stems or stem index out of range — LED off
+                MaschineMK3.setLed(gName, MaschineMK3.Color.OFF);
+                continue;
+            }
             var stemGroup = "[Channel" + deck + "_Stem" + stem + "]";
             var isMuted = engine.getValue(stemGroup, "mute");
             if (isMuted) {
@@ -1590,24 +1597,41 @@ MaschineMK3.init = function(/* id, debugging */) {
     engine.makeConnection("[Channel2]", "beatloop_size",
         function() { MaschineMK3.updatePadLEDs(); });
 
-    // --- G button LED feedback: stem mute/volume/color ---
-    for (var sDeck = 1; sDeck <= 2; sDeck++) {
-        for (var sStem = 1; sStem <= 4; sStem++) {
-            (function(d, s) {
-                var stemGroup = "[Channel" + d + "_Stem" + s + "]";
-                engine.makeConnection(stemGroup, "mute",
-                    function() { MaschineMK3.updateStemLEDs(); });
-                engine.makeConnection(stemGroup, "volume",
-                    function() { MaschineMK3.updateStemLEDs(); });
-                engine.makeConnection(stemGroup, "color",
-                    function() { MaschineMK3.updateStemLEDs(); });
-            })(sDeck, sStem);
-        }
-    }
-    MaschineMK3.updateStemLEDs();
+    // --- G button LED feedback: stem connections created lazily on track load ---
+    MaschineMK3.stemConnections = [];
 
-    // --- Track loaded: close library/T9 when a track is loaded into either deck ---
+    MaschineMK3.connectStemLEDs = function() {
+        // Disconnect previous stem connections
+        for (var i = 0; i < MaschineMK3.stemConnections.length; i++) {
+            MaschineMK3.stemConnections[i].disconnect();
+        }
+        MaschineMK3.stemConnections = [];
+
+        // Connect to stem controls (only exist after a stem file is loaded)
+        for (var d = 1; d <= 2; d++) {
+            for (var s = 1; s <= 4; s++) {
+                (function(deck, stem) {
+                    var stemGroup = "[Channel" + deck + "_Stem" + stem + "]";
+                    var c1 = engine.makeConnection(stemGroup, "mute",
+                        function() { MaschineMK3.updateStemLEDs(); });
+                    var c2 = engine.makeConnection(stemGroup, "volume",
+                        function() { MaschineMK3.updateStemLEDs(); });
+                    var c3 = engine.makeConnection(stemGroup, "color",
+                        function() { MaschineMK3.updateStemLEDs(); });
+                    if (c1) { MaschineMK3.stemConnections.push(c1); }
+                    if (c2) { MaschineMK3.stemConnections.push(c2); }
+                    if (c3) { MaschineMK3.stemConnections.push(c3); }
+                })(d, s);
+            }
+        }
+        MaschineMK3.updateStemLEDs();
+    };
+
+    // --- Track loaded: reconnect stem LEDs, close library/T9 ---
     MaschineMK3.onTrackLoaded = function() {
+        // Reconnect stem LEDs (stem controls only exist after loading a stem file)
+        MaschineMK3.connectStemLEDs();
+
         if (MaschineMK3.libraryVisible) {
             MaschineMK3.libraryVisible = false;
             if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = "cuepoints"; }
