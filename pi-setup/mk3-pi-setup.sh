@@ -19,7 +19,6 @@ echo ""
 echo "--- [1/9] Installing dependencies ---"
 sudo apt-get update -qq
 sudo apt-get install -y \
-    mixxx \
     libusb-1.0-0-dev \
     libfreetype-dev \
     libx11-dev \
@@ -43,6 +42,18 @@ sudo apt-get install -y \
     x11-xserver-utils \
     cifs-utils
 
+# ── 1b. Install Mixxx 2.6 beta (pre-built .deb with stem support) ───
+echo "--- [1b/9] Installing Mixxx 2.6 beta ---"
+MIXXX_DEB="$PROJECT_DIR/mixxx_2.6.0-beta-1_arm64.deb"
+if [ -f "$MIXXX_DEB" ]; then
+    # Remove apt-installed mixxx if present (avoids conflicts)
+    sudo apt-get remove -y mixxx mixxx-data 2>/dev/null || true
+    sudo dpkg -i "$MIXXX_DEB" || sudo apt-get -f install -y
+    echo "Mixxx 2.6 beta installed from .deb"
+else
+    echo "WARNING: $MIXXX_DEB not found — install Mixxx manually"
+fi
+
 # ── 2. Build screen daemon ──────────────────────────────────────────
 echo "--- [2/9] Building screen daemon ---"
 cd "$PROJECT_DIR"
@@ -65,9 +76,7 @@ echo "Mapping installed to: $MIXXX_DIR/"
 rm -rf "$PI_HOME/.mixxx/skins/MK3"
 SKIN_DIR="/usr/share/mixxx/skins/MK3"
 sudo mkdir -p "$SKIN_DIR"
-sudo cp "$PROJECT_DIR/skin/MK3/"*.xml "$SKIN_DIR/"
-sudo cp "$PROJECT_DIR/skin/MK3/"*.qss "$SKIN_DIR/"
-sudo cp "$PROJECT_DIR/skin/MK3/"*.png "$SKIN_DIR/" 2>/dev/null || true
+sudo cp -r "$PROJECT_DIR/skin/MK3/"* "$SKIN_DIR/"
 echo "Skin installed to: $SKIN_DIR/"
 
 # ── 4. Configure Mixxx ──────────────────────────────────────────────
