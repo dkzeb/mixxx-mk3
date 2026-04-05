@@ -7,6 +7,13 @@
 // eslint-disable-next-line no-var
 var MaschineMK3 = {};
 
+// --- Tempo ramp configuration ---
+var RAMP_BPM_PER_SEC = 2.0;
+var RAMP_INTERVAL_MS = 50;
+var RAMP_THRESHOLD_BPM = 0.05;
+var RAMP_MULTIPLIERS = [1.0, 0.5, 2.0];
+var RAMP_TARGET_STEP_THRESHOLD = 400;
+
 // ---------------------------------------------------------------------------
 // Button map: name -> [byteAddr, bitmask]
 // Byte addresses are the indices into the Report ID 0x01 HID input packet
@@ -382,6 +389,17 @@ MaschineMK3.libraryVisible  = false;    // whether the library panel is shown
 MaschineMK3.sidebarVisible  = false;    // whether the library sidebar is shown
 MaschineMK3.mixerVisible    = false;    // whether the mixer panel is shown
 MaschineMK3.stemMixerVisible = false;   // whether the stem mixer panel is shown
+MaschineMK3.tempoVisible = false;
+MaschineMK3.tempoState = {
+    rampTimerA: 0,
+    rampTimerB: 0,
+    rampMultiplierA: 0,
+    rampMultiplierB: 0,
+    rampTargetAccumA: 0,
+    rampTargetAccumB: 0,
+    rampLedTimer: 0,
+    rampLedState: false,
+};
 MaschineMK3.overlayActive   = false;    // overlay widget has focus — suppress HID processing
 
 MaschineMK3.padMode       = "cuepoints"; // "cuepoints" | "loops" | "effects" | "t9" — cuepoints is default
@@ -498,6 +516,58 @@ MaschineMK3.updateLibrary = function() {
 };
 
 // ---------------------------------------------------------------------------
+// toggleTempoPanel — show/hide tempo panel on both screens.
+// ---------------------------------------------------------------------------
+MaschineMK3.toggleTempoPanel = function() {
+    MaschineMK3.tempoVisible = !MaschineMK3.tempoVisible;
+    if (MaschineMK3.tempoVisible) {
+        MaschineMK3.libraryVisible = false;
+        MaschineMK3.mixerVisible = false;
+        MaschineMK3.stemMixerVisible = false;
+        MaschineMK3.cueDisplayVisible = false;
+        MaschineMK3.setLed("notes", 0);
+        if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = "cuepoints"; }
+        MaschineMK3.updatePadModeLED();
+        MaschineMK3.updatePadLEDs();
+    }
+    MaschineMK3.updateTempoLed();
+    MaschineMK3.updatePanels();
+};
+
+// ---------------------------------------------------------------------------
+// updateTempoLed — set TEMPO button LED based on panel and ramp state.
+// ---------------------------------------------------------------------------
+MaschineMK3.updateTempoLed = function() {
+    var anyRamp = MaschineMK3.tempoState.rampTimerA || MaschineMK3.tempoState.rampTimerB;
+    if (anyRamp) {
+        return;
+    }
+    MaschineMK3.setLed("tempo", MaschineMK3.tempoVisible ? 63 : 0);
+};
+
+// ---------------------------------------------------------------------------
+// handleRampTargetKnob — sticky knob for ramp target selection.
+// Accumulates knob delta and steps through multipliers when threshold crossed.
+// ---------------------------------------------------------------------------
+MaschineMK3.handleRampTargetKnob = function(deck, delta) {
+    var key = (deck === 1) ? "rampTargetAccumA" : "rampTargetAccumB";
+    var mulKey = (deck === 1) ? "rampMultiplierA" : "rampMultiplierB";
+    MaschineMK3.tempoState[key] += delta;
+
+    if (MaschineMK3.tempoState[key] >= RAMP_TARGET_STEP_THRESHOLD) {
+        MaschineMK3.tempoState[key] = 0;
+        if (MaschineMK3.tempoState[mulKey] < RAMP_MULTIPLIERS.length - 1) {
+            MaschineMK3.tempoState[mulKey]++;
+        }
+    } else if (MaschineMK3.tempoState[key] <= -RAMP_TARGET_STEP_THRESHOLD) {
+        MaschineMK3.tempoState[key] = 0;
+        if (MaschineMK3.tempoState[mulKey] > 0) {
+            MaschineMK3.tempoState[mulKey]--;
+        }
+    }
+};
+
+// ---------------------------------------------------------------------------
 // updatePanels — show/hide library or mixer on the non-active deck's screen.
 // Only one panel can be visible at a time. Both replace the non-active deck.
 // ---------------------------------------------------------------------------
@@ -505,21 +575,23 @@ MaschineMK3.updatePanels = function() {
     var showLib = MaschineMK3.libraryVisible;
     var showMix = MaschineMK3.mixerVisible;
     var showStemMix = MaschineMK3.stemMixerVisible;
-    var noPanelOpen = !showLib && !showMix && !showStemMix;
+    var showTempo = MaschineMK3.tempoVisible;
+    var noPanelOpen = !showLib && !showMix && !showStemMix && !showTempo;
     var showPadsLoops = noPanelOpen && MaschineMK3.padMode === "loops";
     var showPadsFx = noPanelOpen && MaschineMK3.padMode === "effects";
     var showPadsCues = noPanelOpen && MaschineMK3.cueDisplayVisible;
-    var anyPanel = showLib || showMix || showStemMix || showPadsLoops || showPadsFx || showPadsCues;
+    var anyPanel = showLib || showMix || showStemMix || showTempo || showPadsLoops || showPadsFx || showPadsCues;
 
     engine.setValue("[Skin]", "show_library", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_mixer", showMix ? 1 : 0);
     engine.setValue("[Skin]", "show_stem_mixer", showStemMix ? 1 : 0);
+    engine.setValue("[Skin]", "show_tempo", showTempo ? 1 : 0);
     engine.setValue("[Skin]", "show_t9", showLib ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_loops", showPadsLoops ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_fx", showPadsFx ? 1 : 0);
     engine.setValue("[Skin]", "show_pads_cues", showPadsCues ? 1 : 0);
 
-    if (showLib) {
+    if (showLib || showTempo) {
         // Library: always left screen, T9 pad overview: always right screen
         engine.setValue("[Skin]", "hide_deck_a", 1);
         engine.setValue("[Skin]", "hide_deck_b", 1);
@@ -904,6 +976,7 @@ MaschineMK3.onButtonPress = function(name) {
             MaschineMK3.libraryVisible = false;
             MaschineMK3.mixerVisible = false;
             MaschineMK3.stemMixerVisible = false;
+            MaschineMK3.tempoVisible = false;
         }
         MaschineMK3.setLed("notes", MaschineMK3.cueDisplayVisible ? 63 : 0);
         MaschineMK3.updatePanels();
@@ -924,6 +997,7 @@ MaschineMK3.onButtonPress = function(name) {
             MaschineMK3.mixerVisible = false;
             MaschineMK3.stemMixerVisible = false;
             MaschineMK3.cueDisplayVisible = false;
+            MaschineMK3.tempoVisible = false;
         }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
@@ -945,6 +1019,39 @@ MaschineMK3.onButtonPress = function(name) {
         }
         if (MaschineMK3.libraryVisible && name === "d4") {
             engine.setValue("[Library]", "scanLibrary", 1);
+            break;
+        }
+        // Tempo panel D-button routing
+        if (MaschineMK3.tempoVisible) {
+            if (dNum === 1) {
+                engine.setValue("[Channel1]", "sync_enabled",
+                    engine.getValue("[Channel1]", "sync_enabled") ? 0 : 1);
+            } else if (dNum === 5) {
+                engine.setValue("[Channel2]", "sync_enabled",
+                    engine.getValue("[Channel2]", "sync_enabled") ? 0 : 1);
+            } else if (dNum === 2) {
+                engine.setValue("[Channel1]", "keylock",
+                    engine.getValue("[Channel1]", "keylock") ? 0 : 1);
+            } else if (dNum === 6) {
+                engine.setValue("[Channel2]", "keylock",
+                    engine.getValue("[Channel2]", "keylock") ? 0 : 1);
+            } else if (dNum === 3) {
+                if (MaschineMK3.tempoState.rampTimerA) {
+                    MaschineMK3.stopRamp(1);
+                } else {
+                    MaschineMK3.startRamp(1);
+                }
+            } else if (dNum === 7) {
+                if (MaschineMK3.tempoState.rampTimerB) {
+                    MaschineMK3.stopRamp(2);
+                } else {
+                    MaschineMK3.startRamp(2);
+                }
+            } else if (dNum === 4) {
+                engine.setValue("[Channel1]", "rate", 0);
+            } else if (dNum === 8) {
+                engine.setValue("[Channel2]", "rate", 0);
+            }
             break;
         }
         // Normal DJ mode D-button behavior
@@ -985,6 +1092,7 @@ MaschineMK3.onButtonPress = function(name) {
         if (MaschineMK3.libraryVisible) {
             MaschineMK3.mixerVisible = false;
             MaschineMK3.stemMixerVisible = false;
+            MaschineMK3.tempoVisible = false;
             MaschineMK3.padMode = "t9";
             MaschineMK3.librarySidebarPos = 0;
             MaschineMK3.activeLibraryTab = "tracks";
@@ -1016,18 +1124,25 @@ MaschineMK3.onButtonPress = function(name) {
                 MaschineMK3.mixerVisible = false;
                 MaschineMK3.libraryVisible = false;
                 MaschineMK3.cueDisplayVisible = false;
+                MaschineMK3.tempoVisible = false;
             }
         } else {
             MaschineMK3.mixerVisible = !MaschineMK3.mixerVisible;
             if (MaschineMK3.mixerVisible) {
                 MaschineMK3.libraryVisible = false;
                 MaschineMK3.stemMixerVisible = false;
+                MaschineMK3.tempoVisible = false;
             }
         }
         if (MaschineMK3.padMode === "t9") { MaschineMK3.padMode = "cuepoints"; }
         MaschineMK3.updatePadModeLED();
         MaschineMK3.updatePadLEDs();
         MaschineMK3.updatePanels();
+        break;
+
+    // --- Tempo: toggle tempo panel ---
+    case "tempo":
+        MaschineMK3.toggleTempoPanel();
         break;
 
     // --- Settings: Handled by mk3-overlay daemon ---
@@ -1112,16 +1227,16 @@ MaschineMK3.onButtonRelease = function(name) {
         break;
     // D button releases — tempo nudge (momentary)
     case "d2":
-        engine.setValue("[Channel1]", "rate_temp_down", 0);
+        if (!MaschineMK3.tempoVisible) { engine.setValue("[Channel1]", "rate_temp_down", 0); }
         break;
     case "d3":
-        engine.setValue("[Channel1]", "rate_temp_up", 0);
+        if (!MaschineMK3.tempoVisible) { engine.setValue("[Channel1]", "rate_temp_up", 0); }
         break;
     case "d6":
-        engine.setValue("[Channel2]", "rate_temp_down", 0);
+        if (!MaschineMK3.tempoVisible) { engine.setValue("[Channel2]", "rate_temp_down", 0); }
         break;
     case "d7":
-        engine.setValue("[Channel2]", "rate_temp_up", 0);
+        if (!MaschineMK3.tempoVisible) { engine.setValue("[Channel2]", "rate_temp_up", 0); }
         break;
     // Library nav pulses
     case "navUp":
@@ -1160,6 +1275,15 @@ MaschineMK3.getKnobBinding = function(knobName) {
             }
             return {group: stemGroup, key: "volume"};
         }
+    }
+    if (MaschineMK3.tempoVisible) {
+        switch (knobName) {
+        case "k1": return {group: "[Channel1]", key: "rate"};
+        case "k2": return {group: "[Channel1]", key: "pitch_adjust"};
+        case "k5": return {group: "[Channel2]", key: "rate"};
+        case "k6": return {group: "[Channel2]", key: "pitch_adjust"};
+        }
+        return null;
     }
     if (MaschineMK3.mixerVisible) {
         switch (knobName) {
@@ -1276,6 +1400,30 @@ MaschineMK3.onKnobChange = function(name, value) {
             return;
         }
         // Non-stem knobs fall through to normal mode
+    }
+
+    if (MaschineMK3.tempoVisible) {
+        switch (name) {
+        case "k1":
+            MaschineMK3.adjustValue("[Channel1]", "rate", delta, 0.002, -1, 1);
+            break;
+        case "k2":
+            MaschineMK3.adjustValue("[Channel1]", "pitch_adjust", delta, 0.01, -6, 6);
+            break;
+        case "k4":
+            MaschineMK3.handleRampTargetKnob(1, delta);
+            break;
+        case "k5":
+            MaschineMK3.adjustValue("[Channel2]", "rate", delta, 0.002, -1, 1);
+            break;
+        case "k6":
+            MaschineMK3.adjustValue("[Channel2]", "pitch_adjust", delta, 0.01, -6, 6);
+            break;
+        case "k8":
+            MaschineMK3.handleRampTargetKnob(2, delta);
+            break;
+        }
+        return;
     }
 
     if (MaschineMK3.mixerVisible) {
