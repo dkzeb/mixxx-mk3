@@ -68,17 +68,24 @@ for svc in mixxx.service mk3-t9-daemon.service mk3-mouse-daemon.service mk3-over
             "$SCRIPT_DIR/$svc" | sudo tee /etc/systemd/system/$svc > /dev/null
     fi
 done
+# Boot splash (only needs path patching)
+if [ -f "$SCRIPT_DIR/mk3-bootsplash.service" ]; then
+    sed -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
+        "$SCRIPT_DIR/mk3-bootsplash.service" | sudo tee /etc/systemd/system/mk3-bootsplash.service > /dev/null
+    sudo systemctl enable mk3-bootsplash.service 2>/dev/null || true
+fi
 echo "  Services updated"
 
 # ── Rebuild screen daemon if source changed ──────────────────────────
-if git diff --name-only "$BEFORE".."$AFTER" | grep -qE "^screen-daemon/|^external/mk3/"; then
-    echo "  Screen daemon source changed — rebuilding..."
+if git diff --name-only "$BEFORE".."$AFTER" | grep -qE "^screen-daemon/|^external/mk3/|^external/mpi-tools/mk3_cli/"; then
+    echo "  Screen daemon or mk3 CLI source changed — rebuilding..."
     cd "$PROJECT_DIR"
     rm -rf build && mkdir build && cd build
     cmake .. -DCAPTURE_BACKEND=x11
-    cmake --build . --target mk3-screen-daemon -j"$(nproc)"
+    cmake --build . --target mk3-screen-daemon mk3_cli -j"$(nproc)"
     sudo install -m 755 screen-daemon/mk3-screen-daemon /usr/local/bin/mk3-screen-daemon
-    echo "  Screen daemon rebuilt and installed"
+    sudo install -m 755 external/mpi-tools/mk3_cli/mk3_cli /usr/local/bin/mk3
+    echo "  Screen daemon and mk3 CLI rebuilt and installed"
 fi
 
 # ── Apply ────────────────────────────────────────────────────────────

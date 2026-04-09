@@ -40,7 +40,8 @@ sudo apt-get install -y \
     wireplumber \
     dmz-cursor-theme \
     x11-xserver-utils \
-    cifs-utils
+    cifs-utils \
+    ffmpeg
 
 # ── 1b. Install Mixxx 2.6 beta (pre-built .deb with stem support) ───
 echo "--- [1b/9] Installing Mixxx 2.6 beta ---"
@@ -59,9 +60,11 @@ echo "--- [2/9] Building screen daemon ---"
 cd "$PROJECT_DIR"
 rm -rf build && mkdir build && cd build
 cmake .. -DCAPTURE_BACKEND=x11
-cmake --build . --target mk3-screen-daemon -j"$(nproc)"
+cmake --build . --target mk3-screen-daemon mk3_cli -j"$(nproc)"
 sudo install -m 755 screen-daemon/mk3-screen-daemon /usr/local/bin/mk3-screen-daemon
+sudo install -m 755 external/mpi-tools/mk3_cli/mk3_cli /usr/local/bin/mk3
 echo "Installed: /usr/local/bin/mk3-screen-daemon"
+echo "Installed: /usr/local/bin/mk3"
 
 # ── 3. Install HID mapping ──────────────────────────────────────────
 echo "--- [3/9] Installing MK3 controller mapping ---"
@@ -223,9 +226,14 @@ sed -e "s/User=pi/User=$PI_USER/" \
     -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
     "$SCRIPT_DIR/mk3-overlay.service" | sudo tee /etc/systemd/system/mk3-overlay.service > /dev/null
 
+# Boot splash — patched for this user
+sed -e "s|/home/pi/mixxx-mk3|$PI_HOME/mixxx-mk3|" \
+    "$SCRIPT_DIR/mk3-bootsplash.service" | sudo tee /etc/systemd/system/mk3-bootsplash.service > /dev/null
+
 sudo systemctl daemon-reload
 sudo systemctl enable xvfb.service
 sudo systemctl enable openbox.service
+sudo systemctl enable mk3-bootsplash.service
 sudo systemctl enable mk3-screen-daemon.service
 sudo systemctl enable mixxx.service
 sudo systemctl enable mk3-t9-daemon.service

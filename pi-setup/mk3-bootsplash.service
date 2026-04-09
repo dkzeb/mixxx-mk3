@@ -1,0 +1,13 @@
+[Unit]
+Description=MK3 Boot Splash
+After=local-fs.target
+Before=mk3-screen-daemon.service
+Conflicts=mk3-screen-daemon.service
+
+[Service]
+Type=simple
+ExecStart=/home/pi/mixxx-mk3/pi-setup/mk3-bootsplash.sh
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
