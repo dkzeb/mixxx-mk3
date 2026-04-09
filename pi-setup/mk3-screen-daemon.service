@@ -6,9 +6,8 @@ Wants=openbox.service
 [Service]
 Type=simple
 Environment=DISPLAY=:99
-ExecStartPre=/bin/bash -c 'for i in $(seq 1 30); do [ -S /tmp/.X11-unix/X99 ] && exit 0; sleep 1; done'
 ExecStartPre=-/bin/systemctl stop mk3-bootsplash.service
-ExecStartPre=/bin/sleep 2
+ExecStartPre=/bin/sleep 1
 ExecStart=/usr/local/bin/mk3-screen-daemon --resolution 960x272 --fps 15 --no-partial
 Restart=always
 RestartSec=3

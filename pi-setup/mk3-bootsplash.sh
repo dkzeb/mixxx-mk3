@@ -3,11 +3,8 @@ set -euo pipefail
 
 # MK3 Boot Splash
 # Left screen:  animated GIF logo (boomerang loop)
-# Right screen: live boot log output
-# Stopped automatically when mk3-screen-daemon takes over.
-#
-# Frames are pre-extracted at install time to /var/lib/mk3-bootsplash/
-# so boot startup is instant (no ffmpeg at boot).
+# Right screen: live boot log, then "Starting MaschinePi OS..." when Mixxx starts
+# Self-terminates to let mk3-screen-daemon take over.
 
 MK3="/usr/local/bin/mk3"
 FRAME_DIR="/var/lib/mk3-bootsplash"
@@ -36,19 +33,25 @@ for ((i = NFRAMES - 2; i >= 1; i--)); do
 done
 SEQ_LEN=${#SEQ[@]}
 
-# ── Main loop: alternate left animation + right boot log ─────────────
+# ── Main loop ─────────────────────────────────────────────────────────
 frame_idx=0
 tick=0
-LOG_INTERVAL=5  # update boot log every N animation frames
+LOG_INTERVAL=5
 
 while true; do
     # Left screen: next animation frame
     cat "${FRAMES[${SEQ[$frame_idx]}]}" | "$MK3" --pipe --target left 2>/dev/null || true
     frame_idx=$(( (frame_idx + 1) % SEQ_LEN ))
 
-    # Right screen: boot log (every LOG_INTERVAL frames to prioritise animation)
+    # Right screen: boot log or handoff check (every LOG_INTERVAL frames)
     tick=$(( (tick + 1) % LOG_INTERVAL ))
     if [ "$tick" -eq 0 ]; then
+        # When Mixxx is starting, show final message and exit
+        if systemctl is-active mixxx.service 2>/dev/null | grep -qE "^(active|activating)"; then
+            "$MK3" --text "Starting MaschinePi OS..." --target right --font-size 20 2>/dev/null || true
+            exit 0
+        fi
+
         LINES=$(journalctl -b --no-pager -o cat -n 16 2>/dev/null || echo "Booting...")
         "$MK3" --text "$LINES" --target right --font-size 13 --mono --color 00C880 2>/dev/null || true
     fi
