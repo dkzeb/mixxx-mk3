@@ -46,9 +46,19 @@ while true; do
     # Right screen: boot log or handoff check (every LOG_INTERVAL frames)
     tick=$(( (tick + 1) % LOG_INTERVAL ))
     if [ "$tick" -eq 0 ]; then
-        # When Mixxx is running, show final message and exit
+        # When Mixxx is running, show launch screen and exit
         if systemctl is-active mixxx.service 2>/dev/null | grep -q "^active$"; then
-            "$MK3" --text "Starting MaschinePi OS..." --target right --font-size 20 2>/dev/null || true
+            WIFI=$(iwgetid -r 2>/dev/null || echo "Not connected")
+            HOST=$(hostname 2>/dev/null || echo "unknown")
+            IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+            [ -z "$IP" ] && IP="No IP"
+
+            LAUNCH_MSG="Launching MPI OS
+
+WiFi: $WIFI
+Host: $HOST
+IP:   $IP"
+            "$MK3" --text "$LAUNCH_MSG" --target right --font-size 18 --center 2>/dev/null || true
             sleep 3
             exit 0
         fi
